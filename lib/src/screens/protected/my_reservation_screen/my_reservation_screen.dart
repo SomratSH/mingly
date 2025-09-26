@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MyReservationScreen extends StatelessWidget {
   const MyReservationScreen({super.key});
@@ -31,20 +32,26 @@ class MyReservationScreen extends StatelessWidget {
               child: ListView(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                children: const [
-                  _ReservationCard(
-                    title: "Waves & Raves '' - Celvaie",
-                    location: "Singapore",
-                    imagePath: 'lib/assets/images/dummy_yacht.png',
-                    date: "Aug 25, 2025",
-                    status: "Confirmed",
+                children:  [
+                  InkWell(
+                    onTap: () => context.push('/event-detail'),
+                    child: _ReservationCard(
+                      title: "Waves & Raves '' - Celvaie",
+                      location: "Singapore",
+                      imagePath: 'lib/assets/images/dummy_yacht.png',
+                      date: "Aug 25, 2025",
+                      status: "Confirmed",
+                    ),
                   ),
-                  _ReservationCard(
-                    title: "Sunset Beats",
-                    location: "Bali",
-                    imagePath: 'lib/assets/images/dummy_yacht.png',
-                    date: "Sep 10, 2025",
-                    status: "Pending",
+                  InkWell(
+                    onTap: () => context.push('/event-detail'),
+                    child: _ReservationCard(
+                      title: "Sunset Beats",
+                      location: "Bali",
+                      imagePath: 'lib/assets/images/dummy_yacht.png',
+                      date: "Sep 10, 2025",
+                      status: "Pending",
+                    ),
                   ),
                 ],
               ),

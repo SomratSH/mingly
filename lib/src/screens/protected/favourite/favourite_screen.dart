@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class FavouriteScreen extends StatelessWidget {
   const FavouriteScreen({super.key});
@@ -51,11 +52,14 @@ class FavouriteScreen extends StatelessWidget {
                 itemCount: favourites.length,
                 itemBuilder: (context, index) {
                   final fav = favourites[index];
-                  return FavouriteCard(
-                    title: fav["title"]!,
-                    location: fav["location"]!,
-                    imagePath: fav["image"]!,
-                    iconPath: fav["icon"]!,
+                  return InkWell(
+                    onTap: () => context.push('/venue-detail'),
+                    child: FavouriteCard(
+                      title: fav["title"]!,
+                      location: fav["location"]!,
+                      imagePath: fav["image"]!,
+                      iconPath: fav["icon"]!,
+                    ),
                   );
                 },
               ),

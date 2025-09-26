@@ -181,20 +181,28 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   // Featured Venues
                   _SectionHeader(title: 'Featured Venues'),
-                  _VenueCard(
-                    image: 'lib/assets/images/dummy_calavie.png',
-                    title: 'Celavie',
-                    location: 'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
+                  InkWell(
+                    onTap: () => context.push('/venue-detail'),
+                    child: _VenueCard(
+                      image: 'lib/assets/images/dummy_calavie.png',
+                      title: 'Celavie',
+                      location: 'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
+                    ),
                   ),
-                  _VenueCard(
-                    image: 'lib/assets/images/dummy_muin.png',
-                    title: 'Muin',
-                    location: 'Tan Nuea, Watthana, Bangkok',
+                  InkWell(
+                    onTap: () => context.push('/venue-detail'),
+                    child: _VenueCard(
+                      image: 'lib/assets/images/dummy_muin.png',
+                      title: 'Muin',
+                      location: 'Tan Nuea, Watthana, Bangkok',
+                    ),
                   ),
                   SizedBox(height: 12.h),
                   // Popular Events
                   _SectionHeader(title: 'Popular Events'),
-                  _EventCard(),
+                  InkWell(
+                    onTap: () => context.push('/event-detail'),
+                    child: _EventCard()),
                   const SizedBox(height: 24),
                   // Top 10 spenders
                   Padding(
@@ -225,17 +233,23 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   // Recommendations
                   _SectionHeader(title: 'Recommendations for you'),
-                  _RecommendationCard(
-                    image: 'lib/assets/images/dummy_calavie.png',
-                    title: 'Sky High Soirée- MU;IN',
-                    location: 'New York',
-                    tag: 'Gold member',
+                  InkWell(
+                    onTap: () => context.push('/venue-detail'),
+                    child: _RecommendationCard(
+                      image: 'lib/assets/images/dummy_calavie.png',
+                      title: 'Sky High Soirée- MU;IN',
+                      location: 'New York',
+                      tag: 'Gold member',
+                    ),
                   ),
-                  _RecommendationCard(
-                    image: 'lib/assets/images/dummy_muin.png',
-                    title: '[Waves & Raves ] - Celvaie',
-                    location: 'California',
-                    tag: 'Free',
+                  InkWell(
+                    onTap: () => context.push('/event-detail'),
+                    child: _RecommendationCard(
+                      image: 'lib/assets/images/dummy_muin.png',
+                      title: '[Waves & Raves ] - Celvaie',
+                      location: 'California',
+                      tag: 'Free',
+                    ),
                   ),
                   const SizedBox(height: 32),
                 ],

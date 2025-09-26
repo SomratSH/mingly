@@ -23,85 +23,78 @@ class MembershipScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Membership status card
+            // Membership status card - Fixed structure
             SizedBox(
               height: 200,
-              child: SingleChildScrollView(
-                child: Expanded(
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                       SizedBox(
-                    height: 161.25,
-                    child: PageView(
-                      children: [
-                        Card(
-                          color: Color(0xffD4AF37),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text('Membership Status', style: TextStyle(color: Colors.black54)),
-                                SizedBox(height: 8),
-                                Text('Gold', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
-                                SizedBox(height: 8),
-                                Text('Access to more events, priority booking,  member-only ticket discounts', style: TextStyle(color: Colors.black54)),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Add more cards for other membership types if needed
-                      ],
+              child: PageView(
+                children: [
+                  Card(
+                    color: const Color(0xffD4AF37),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text('Membership Status', style: TextStyle(color: Colors.black54)),
+                          SizedBox(height: 8),
+                          Text('Gold', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+                          SizedBox(height: 8),
+                          Text('Access to more events, priority booking, member-only ticket discounts', style: TextStyle(color: Colors.black54)),
+                        ],
+                      ),
                     ),
                   ),
-                              
-                  // PageView for Membership Types
-                  SizedBox(
-                    height: 161.25,
-                    child: PageView(
-                      children: [
-                        Card(
-                          color: Colors.grey.shade300,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text('Membership Status', style: TextStyle(color: Colors.black54)),
-                                SizedBox(height: 8),
-                                Text('Silver', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
-                                SizedBox(height: 8),
-                                Text('Access to more events, priority booking,  member-only ticket discounts', style: TextStyle(color: Colors.black54)),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Add more cards for other membership types if needed
-                      ],
+                  Card(
+                    color: Colors.grey.shade300,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text('Membership Status', style: TextStyle(color: Colors.black54)),
+                          SizedBox(height: 8),
+                          Text('Silver', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+                          SizedBox(height: 8),
+                          Text('Access to more events, priority booking, member-only ticket discounts', style: TextStyle(color: Colors.black54)),
+                        ],
+                      ),
                     ),
                   ),
-                            
-                  
-                  ],),
-                ),
+                  // Add a third card for demonstration
+                  Card(
+                    color: const Color(0xffCD7F32), // Bronze color
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text('Membership Status', style: TextStyle(color: Colors.black54)),
+                          SizedBox(height: 8),
+                          Text('Bronze', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+                          SizedBox(height: 8),
+                          Text('Basic access to events and standard booking', style: TextStyle(color: Colors.black54)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             
-          
             const SizedBox(height: 8),
             // Indicator dots
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.black45, shape: BoxShape.circle)),
+                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle)),
                   const SizedBox(width: 4),
-                  Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle)),
+                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle)),
                   const SizedBox(width: 4),
-                  Container(width: 8, height: 8, decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle)),
+                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle)),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/components/helpers.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -66,43 +67,43 @@ class WelcomeScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PrimaryButton(
-                            text: "Sign-Up",
-                            onPressed: () {
-                              context.push("/signup");
-                            },
-                            ),
-                          ],
-                          ),
-                          Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                            Text(
-                              'Already have an account?',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white70,
-                              fontSize: 16,
+                              PrimaryButton(
+                                text: "Sign-Up",
+                                onPressed: () {
+                                  context.push("/signup");
+                                },
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            TextButton(
-                              onPressed: () {
-                              context.push("/login");
-                              },
-                              child: Text(
-                              'Login',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                              ),
-                            ),
                             ],
                           ),
+                          Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Already have an account?',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: () {
+                                    context.push("/login");
+                                  },
+                                  child: Text(
+                                    'Login',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

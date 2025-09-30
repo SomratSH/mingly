@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/ticket_booking_screen/custom_book_ticket_sheet.dart';
+import 'package:provider/provider.dart';
 
 class TicketBookingScreen extends StatelessWidget {
   const TicketBookingScreen({super.key});
@@ -8,26 +10,27 @@ class TicketBookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final eventProvider = context.watch<EventsProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,
-        
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-'Buy Ticket',
-style: TextStyle(
-color: const Color(0xFFFFFAE5),
-fontSize: 18,
-fontFamily: 'Lato',
-fontWeight: FontWeight.w600,
-height: 1.56,
-),
-),
+          'Buy Ticket',
+          style: TextStyle(
+            color: const Color(0xFFFFFAE5),
+            fontSize: 18,
+            fontFamily: 'Lato',
+            fontWeight: FontWeight.w600,
+            height: 1.56,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -36,7 +39,13 @@ height: 1.56,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
-            const Text('[Event]', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              eventProvider.selectEventModel.eventName.toString(),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 16),
             Row(
               children: const [
@@ -47,7 +56,10 @@ height: 1.56,
             ),
             const Padding(
               padding: EdgeInsets.only(left: 32),
-              child: Text('Open gate at 20:00', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              child: Text(
+                'Open gate at 20:00',
+                style: TextStyle(color: Colors.white54, fontSize: 12),
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -57,15 +69,42 @@ height: 1.56,
                 Text('Outlet', style: TextStyle(color: Colors.white)),
               ],
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 32),
-              child: Text('[Address]\nCity - Country', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              child: Text(
+                '${eventProvider.selectEventModel.venueName}\nCity - ${eventProvider.selectEventModel.venueCity}',
+                style: TextStyle(color: Colors.white54, fontSize: 12),
+              ),
             ),
             const SizedBox(height: 24),
-            _TicketOption(title: 'Early bird single', price: '2415.00', soldOut: true),
-            _TicketOption(title: 'VIP', price: '2415.00', qty: 50),
-            _TicketOption(title: '[Ticket]', price: '2415.00', qty: 100),
-            _TicketOption(title: '[Ticket]', price: '2415.00', qty: 2, selectedQty: 1, showFire: true),
+            Column(
+              children: eventProvider.eventTicketList.isEmpty
+                  ? [
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          "No tickets available",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ]
+                  : List.generate(eventProvider.eventTicketList.length, (
+                      index,
+                    ) {
+                      final ticket = eventProvider.eventTicketList[index];
+                      return _TicketOption(
+                        id: ticket.id.toString(),
+                        title: ticket.title ?? "",
+                        price: ticket.price?.toString() ?? "0",
+                        soldOut: ticket.isSoldOut != 0,
+                      );
+                    }),
+            ),
+
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -73,15 +112,18 @@ height: 1.56,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD1B26F),
                   foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
                   context.push("/booking-confirmation");
                 },
-                child: const Text('Buy Tickets (2415.00)'),
+                child: Text('Buy Tickets (${eventProvider.totalPrice})'),
               ),
             ),
+            SizedBox(height: 10),
           ],
         ),
       ),
@@ -96,9 +138,11 @@ class _TicketOption extends StatelessWidget {
   final int? selectedQty;
   final bool soldOut;
   final bool showFire;
+  final String id;
   const _TicketOption({
     required this.title,
     required this.price,
+    required this.id,
     this.qty,
     this.selectedQty,
     this.soldOut = false,
@@ -110,7 +154,6 @@ class _TicketOption extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
-        
         color: Color(0xFF2E2D2C),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
@@ -124,15 +167,30 @@ class _TicketOption extends StatelessWidget {
             ],
           ),
           subtitle: qty != null
-              ? Text('24$price\nQty: $qty', style: const TextStyle(color: Colors.white54))
-              : Text('24$price', style: const TextStyle(color: Colors.white54)),
+              ? Text(
+                  '$price\nQty: $qty',
+                  style: const TextStyle(color: Colors.white54),
+                )
+              : Text('$price', style: const TextStyle(color: Colors.white54)),
           trailing: soldOut
               ? const Text('SOLD OUT', style: TextStyle(color: Colors.white54))
               : selectedQty != null
-                  ? Text('$selectedQty', style: const TextStyle(color: Colors.white))
-                  : InkWell(
-                    onTap: ()=> showTicketSelectionModal(context),
-                    child: const Icon(Icons.chevron_right, color: Colors.white)),
+              ? Text(
+                  '$selectedQty',
+                  style: const TextStyle(color: Colors.white),
+                )
+              : InkWell(
+                  onTap: () {
+                    context.read<EventsProvider>().clearData();
+                    showTicketSelectionModal(
+                      context,
+                      double.parse(price),
+                      title,
+                      id,
+                    );
+                  },
+                  child: const Icon(Icons.chevron_right, color: Colors.white),
+                ),
         ),
       ),
     );

@@ -2,24 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/screens/auth/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../../components/helpers.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final provider = context.watch<AuthProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -53,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               // Username field
               SingleLineTextField(
-                controller: emailController,
+                controller: provider.emailController,
                 hintText: "Enter Email",
                 prefixSvg: SvgPicture.asset(
                   'lib/assets/icons/profile.svg',
@@ -68,12 +64,9 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               // Password field
               PasswordInputField(
-                controller: passwordController,
+                controller: provider.passwordController,
                 hintText: "Enter Password",
-                onChanged: (value) {
-                  setState(() {
-                  });
-                },
+
                 prefixSvg: SvgPicture.asset(
                   'lib/assets/icons/lock.svg',
                   width: 24,
@@ -88,8 +81,26 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login button
               PrimaryButton(
                 text: 'Login',
-                onPressed: () {
-                  context.push("/home");
+                onPressed: () async {
+                  LoadingDialog.show(context);
+                  final status = await provider.login();
+                  if (status['message'] != null) {
+                    LoadingDialog.hide(context);
+                    CustomSnackbar.show(
+                      context,
+                      message: status["message"],
+                      textColor: Colors.white,
+                      backgroundColor: Colors.green,
+                    );
+                    context.push("/home");
+                  } else if (status["error"] != null) {
+                    LoadingDialog.hide(context);
+                    CustomSnackbar.show(
+                      context,
+                      message: status["error"],
+                      backgroundColor: Colors.red,
+                    );
+                  }
                 },
               ),
               const SizedBox(height: 32),

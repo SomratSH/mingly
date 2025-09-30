@@ -1,36 +1,23 @@
-
 import 'package:flutter/material.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:provider/provider.dart';
 
-class TicketSelectionModal extends StatefulWidget {
-  const TicketSelectionModal({Key? key}) : super(key: key);
+class TicketSelectionModal extends StatelessWidget {
+  final double ticketPrice;
+  final String ticketName;
+  final String ticketId;
 
-  @override
-  State<TicketSelectionModal> createState() => _TicketSelectionModalState();
-}
-
-class _TicketSelectionModalState extends State<TicketSelectionModal> {
-  int ticketCount = 1;
-  final int maxTickets = 5;
-  final double ticketPrice = 15.00;
-
-  void _incrementTicket() {
-    if (ticketCount < maxTickets) {
-      setState(() {
-        ticketCount++;
-      });
-    }
-  }
-
-  void _decrementTicket() {
-    if (ticketCount > 1) {
-      setState(() {
-        ticketCount--;
-      });
-    }
-  }
+  const TicketSelectionModal({
+    Key? key,
+    required this.ticketPrice,
+    required this.ticketId,
+    required this.ticketName,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<EventsProvider>();
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF1A1A1A),
@@ -52,7 +39,7 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -73,20 +60,19 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                   color: Colors.white,
                   height: 0.3,
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Ticket info and price
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '[Ticket]',
-                          style: TextStyle(
+                        Text(
+                          ticketName,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -94,11 +80,10 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Max ($maxTickets Tickets)',
+                          'Max (${provider.maxTickets} Tickets)',
                           style: const TextStyle(
                             color: Color(0xFF888888),
                             fontSize: 14,
-                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ],
@@ -106,7 +91,7 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                     Row(
                       children: [
                         Text(
-                          '\$${ticketPrice.toStringAsFixed(2)}',
+                          '\$${provider.ticketTotalPrice.toStringAsFixed(2)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -114,30 +99,25 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        // Fire emojis
-                        const Text(
-                          '🔥🔥',
-                          style: TextStyle(fontSize: 14),
-                        ),
+                        const Text('🔥🔥', style: TextStyle(fontSize: 14)),
                       ],
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Counter controls
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Minus button
                     GestureDetector(
-                      onTap: _decrementTicket,
+                      onTap: () => provider.decrementTicket(ticketPrice),
                       child: Container(
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.transparent,
                           border: Border.all(
                             color: const Color(0xFF666666),
                             width: 1,
@@ -146,36 +126,35 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                         ),
                         child: Icon(
                           Icons.remove,
-                          color: ticketCount > 1 
-                              ? Colors.white 
+                          color: provider.ticketCount > 1
+                              ? Colors.white
                               : const Color(0xFF666666),
                           size: 20,
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(width: 32),
-                    
+
                     // Count display
                     Text(
-                      '$ticketCount',
+                      '${provider.ticketCount}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    
+
                     const SizedBox(width: 32),
-                    
+
                     // Plus button
                     GestureDetector(
-                      onTap: _incrementTicket,
+                      onTap: () => provider.incrementTicket(ticketPrice),
                       child: Container(
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.transparent,
                           border: Border.all(
                             color: const Color(0xFF666666),
                             width: 1,
@@ -184,8 +163,8 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                         ),
                         child: Icon(
                           Icons.add,
-                          color: ticketCount < maxTickets 
-                              ? Colors.white 
+                          color: provider.ticketCount < provider.maxTickets
+                              ? Colors.white
                               : const Color(0xFF666666),
                           size: 20,
                         ),
@@ -193,19 +172,23 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Buy button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle buy action
                       Navigator.pop(context, {
-                        'ticketCount': ticketCount,
-                        'totalPrice': ticketCount * ticketPrice,
+                        'ticketCount': provider.ticketCount,
+                        'totalPrice': provider.totalPrice,
                       });
+                      provider.addOrUpdateTicket(
+                        ticketId,
+                        provider.ticketCount,
+                      );
+                      // provider.clearData();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF5F5F5),
@@ -216,17 +199,15 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
                       ),
                       elevation: 0,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Buy',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                
-                // Bottom padding for safe area
                 SizedBox(height: MediaQuery.of(context).padding.bottom),
               ],
             ),
@@ -238,15 +219,26 @@ class _TicketSelectionModalState extends State<TicketSelectionModal> {
 }
 
 // Helper function to show the modal
-void showTicketSelectionModal(BuildContext context) {
+void showTicketSelectionModal(
+  BuildContext context,
+  double ticketPrice,
+  String ticketName,
+  String ticketId,
+) {
+  final provider = context.read<EventsProvider>();
+  provider.start(ticketPrice); // reset state before opening
+
   showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (context) => const TicketSelectionModal(),
+    builder: (context) => TicketSelectionModal(
+      ticketPrice: ticketPrice,
+      ticketName: ticketName,
+      ticketId: ticketId,
+    ),
   ).then((result) {
     if (result != null) {
-      // Handle the result
       print('Selected ${result['ticketCount']} tickets');
       print('Total price: \$${result['totalPrice'].toStringAsFixed(2)}');
     }

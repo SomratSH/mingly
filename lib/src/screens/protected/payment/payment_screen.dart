@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confirm_dialog.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:provider/provider.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   @override
@@ -12,10 +16,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final eventProvider = context.watch<EventsProvider>();
     return Scaffold(
-     
       appBar: AppBar(
-   
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
@@ -69,50 +72,71 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 24),
-            
+
             // Mastercard section
             _buildPaymentSection(
               cardType: 'Mastercard',
-              logoAsset: 'lib/assets/images/mastercard.png', // You'll need to add this asset
+              logoAsset:
+                  'lib/assets/images/mastercard.png', // You'll need to add this asset
               cards: [
                 PaymentCard(name: 'Tyler Howell', last4: '2355'),
                 PaymentCard(name: 'Tyler Howell', last4: '2881'),
               ],
               isExpanded: true,
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Visa section
             _buildPaymentSection(
               cardType: 'Visa',
-              logoAsset: 'lib/assets/images/visa.png', // You'll need to add this asset
+              logoAsset:
+                  'lib/assets/images/visa.png', // You'll need to add this asset
               cards: [],
               isExpanded: false,
             ),
-            
+
             Spacer(),
-            
+
             // Pay button
-             SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD1B26F),
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD1B26F),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: () {
-                   context.push('/booking-summary');
-                  },
-                  child: const Text('Pay (\$15.00)'),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
+                onPressed: () async {
+                  LoadingDialog.show(context);
+                  final status = await eventProvider.buyTicketEvent(
+                    eventProvider
+                        .buildOrderRequest(
+                          promoCode: eventProvider.promoCode ?? "",
+                        )
+                        .toJson(),
+                    eventProvider.selectEventModel.id.toString(),
+                  );
+                  LoadingDialog.hide(context);
+
+                  if (status != null) {
+                    showCustomConfirmDialogEventTicket(
+                      context,
+                      eventProvider.selectedTickets.length.toString(),
+                      status["message"],
+                    );
+                  }
+
+                  // context.push('/booking-summary');
+                },
+                child: Text('Pay (\$${eventProvider.totalPrice})'),
               ),
+            ),
           ],
         ),
       ),
@@ -137,11 +161,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           child: Row(
             children: [
               // Card logo placeholder (you can replace with actual logo)
-              Container(
-                width: 32,
-                height: 20,
-                child: Image.asset(logoAsset),
-              ),
+              Container(width: 32, height: 20, child: Image.asset(logoAsset)),
               SizedBox(width: 12),
               Text(
                 cardType,
@@ -153,14 +173,16 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               ),
               Spacer(),
               Icon(
-                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
                 color: Colors.white,
                 size: 20,
               ),
             ],
           ),
         ),
-        
+
         // Cards list (only show if expanded)
         if (isExpanded && cards.isNotEmpty) ...[
           SizedBox(height: 8),
@@ -173,14 +195,16 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget _buildPaymentCard(PaymentCard card) {
     String cardKey = '${card.name}_${card.last4}';
     bool isSelected = selectedPaymentMethod == cardKey;
-    
+
     return Container(
       margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
-        border: isSelected ? Border.all(color: Color(0xFFDAA520), width: 2) : null,
+        border: isSelected
+            ? Border.all(color: Color(0xFFDAA520), width: 2)
+            : null,
       ),
       child: InkWell(
         onTap: () {
@@ -194,8 +218,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             Container(
               width: 24,
               height: 16,
-             
-              child: SvgPicture.asset("lib/assets/icons/Payment.svg")
+
+              child: SvgPicture.asset("lib/assets/icons/Payment.svg"),
             ),
             SizedBox(width: 12),
             Expanded(
@@ -212,10 +236,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   ),
                   Text(
                     '•••• •••• •••• ${card.last4}',
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                   ),
                 ],
               ),
@@ -233,11 +254,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 color: isSelected ? Color(0xFFDAA520) : Colors.transparent,
               ),
               child: isSelected
-                  ? Icon(
-                      Icons.check,
-                      color: Colors.black,
-                      size: 12,
-                    )
+                  ? Icon(Icons.check, color: Colors.black, size: 12)
                   : null,
             ),
           ],
@@ -253,5 +270,3 @@ class PaymentCard {
 
   PaymentCard({required this.name, required this.last4});
 }
-
-

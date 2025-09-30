@@ -2,23 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/screens/auth/auth_provider.dart';
+import 'package:mingly/src/screens/protected/event_detail_screen/widget/custom_dialog_membership.dart';
+import 'package:provider/provider.dart';
 
 import '../../../components/helpers.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
-}
-
-class _SignupScreenState extends State<SignupScreen> {
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<AuthProvider>();
+
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -53,7 +51,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 32),
               // Username field
               SingleLineTextField(
-                controller: emailController,
+                controller: provider.emailController,
                 hintText: "Enter Email",
                 prefixSvg: SvgPicture.asset(
                   'lib/assets/icons/profile.svg',
@@ -68,12 +66,9 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 20),
               // Password field
               PasswordInputField(
-                controller: passwordController,
+                controller: provider.passwordController,
                 hintText: "Enter Password",
-                onChanged: (value) {
-                  setState(() {
-                  });
-                },
+                onChanged: (value) {},
                 prefixSvg: SvgPicture.asset(
                   'lib/assets/icons/lock.svg',
                   width: 24,
@@ -88,8 +83,27 @@ class _SignupScreenState extends State<SignupScreen> {
               // Signup button
               PrimaryButton(
                 text: 'Sign Up',
-                onPressed: () {
-                  context.push("/email-verification");
+                onPressed: () async {
+                  LoadingDialog.show(context);
+                  final status = await provider.signUpUser();
+                  if (status['message'] != null) {
+                    LoadingDialog.hide(context);
+                    CustomSnackbar.show(
+                      context,
+                      message: status["message"],
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                    );
+                    context.push("/otp-verification");
+                  } else if (status["email"] != null) {
+                    LoadingDialog.hide(context);
+                    CustomSnackbar.show(
+                      context,
+                      message: status["email"][0],
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                    );
+                  }
                 },
               ),
               const SizedBox(height: 32),

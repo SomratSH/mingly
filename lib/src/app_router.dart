@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/application/events/model/events_model.dart';
 import 'package:mingly/src/screens/auth/email_verification_screen/email_verification_screen.dart';
 import 'package:mingly/src/screens/auth/login_screen/login_screen.dart';
+import 'package:mingly/src/screens/auth/otp_verification_screen/otp_verfication_forgot_password.dart';
 import 'package:mingly/src/screens/auth/otp_verification_screen/otp_verification_screen.dart';
 import 'package:mingly/src/screens/auth/password_reset_screen/password_reset_screen.dart';
 import 'package:mingly/src/screens/auth/signup_screen/signup_screen.dart';
@@ -31,143 +33,153 @@ import 'package:mingly/src/screens/protected/table_booking_screen/table_booking_
 import 'package:mingly/src/screens/protected/ticket_booking_screen/ticket_booking_screen.dart';
 import 'package:mingly/src/screens/protected/venue_detail_screen/venue_detail_screen.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_list_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppRouter {
-static  final router = GoRouter(
-    debugLogDiagnostics: true,
-    initialLocation: '/welcome',
-    routes: [
-      // Auth routes
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
-      ),
-      GoRoute(
-        path: '/signup',
-        builder: (context, state) => const SignupScreen(),
-      ),
-      GoRoute(
-        path: '/password-reset',
-        builder: (context, state) => const PasswordResetScreen(),
-      ),
-      GoRoute(
-        path: '/otp-verification',
-        builder: (context, state) => const OTPVerificationScreen(),
-      ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(
-        path: '/email-verification',
-        builder: (context, state) => const EmailVerificationScreen(),
-      ),
-      GoRoute(path: "/event-list", builder: (context, state) => const EventListScreen()),
+  static Future<GoRouter> createRouter() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
 
-      // GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-      GoRoute(
-        path: '/venue-list',
-        builder: (context, state) => const VenueListScreen(),
-      ),
-      GoRoute(
-        path: '/ticket-booking',
-        builder: (context, state) => const TicketBookingScreen(),
-      ),
-      GoRoute(
-        path: '/venue-detail',
-        builder: (context, state) => const VenueDetailScreen(),
-      ),
-      GoRoute(
-        path: '/table-booking',
-        builder: (context, state) => const TableBookingScreen(),
-      ),
-      GoRoute(
-        path: '/select-country',
-        builder: (context, state) => const SelectCountryScreen(),
-      ),
-      GoRoute(
-        path: '/select-payment',
-        builder: (context, state) => const SelectPaymentScreen(),
-      ),
-     
+    final initial = (token != null && token.isNotEmpty) ? "/home" : "/welcome";
+
+    return GoRouter(
+      debugLogDiagnostics: true,
+      initialLocation: initial,
+      routes: [
+        // Auth routes
         GoRoute(
-        path: '/my-bottles',
-        builder: (context, state) => const MyBottlesScreen(),
-      ),
-       GoRoute(
-        path: '/my-bottles',
-        builder: (context, state) => const MyBottlesScreen(),
-      ),
-      GoRoute(
-        path: '/my-bottles-history',
-        builder: (context, state) => const MyBottlesHistoryScreen(),
-      ),
-      GoRoute(
-        path: '/personal-info',
-        builder: (context, state) => const PersonalInfoScreen(),
-      ),
-     
-      GoRoute(
-        path: '/membership',
-        builder: (context, state) => const MembershipScreen(),
-      ),
-      GoRoute(
-        path: '/food-menu',
-        builder: (context, state) => const FoodMenuScreen(),
-      ),
-      GoRoute(
-        path: '/event-detail',
-        builder: (context, state) => const EventDetailScreen(),
-      ),
-      GoRoute(
-        path: '/event-detail-one',
-        builder: (context, state) => const EventDetailsScreenOne(),
-      ),
+          path: '/welcome',
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => const SignupScreen(),
+        ),
+        GoRoute(
+          path: '/password-reset',
+          builder: (context, state) => const PasswordResetScreen(),
+        ),
+        GoRoute(
+          path: '/otp-verification',
+          builder: (context, state) => const OTPVerificationScreen(),
+        ),
+        GoRoute(
+          path: '/otp-verification-forgot-password',
+          builder: (context, state) => const OtpVerficationForgotPassword(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/email-verification',
+          builder: (context, state) => const EmailVerificationScreen(),
+        ),
+        GoRoute(
+          path: '/event-list',
+          builder: (context, state) => const EventListScreen(),
+        ),
+        GoRoute(
+          path: '/venue-list',
+          builder: (context, state) => const VenueListScreen(),
+        ),
+        GoRoute(
+          path: '/ticket-booking',
+          builder: (context, state) => const TicketBookingScreen(),
+        ),
+        GoRoute(
+          path: '/venue-detail',
+          builder: (context, state) => const VenueDetailScreen(),
+        ),
+        GoRoute(
+          path: '/table-booking',
+          builder: (context, state) => const TableBookingScreen(),
+        ),
+        GoRoute(
+          path: '/select-country',
+          builder: (context, state) => const SelectCountryScreen(),
+        ),
+        GoRoute(
+          path: '/select-payment',
+          builder: (context, state) => const SelectPaymentScreen(),
+        ),
+        GoRoute(
+          path: '/my-bottles',
+          builder: (context, state) => const MyBottlesScreen(),
+        ),
+        GoRoute(
+          path: '/my-bottles-history',
+          builder: (context, state) => const MyBottlesHistoryScreen(),
+        ),
+        GoRoute(
+          path: '/personal-info',
+          builder: (context, state) => const PersonalInfoScreen(),
+        ),
+        GoRoute(
+          path: '/membership',
+          builder: (context, state) => const MembershipScreen(),
+        ),
+        GoRoute(
+          path: '/food-menu',
+          builder: (context, state) => const FoodMenuScreen(),
+        ),
+        GoRoute(
+          path: '/event-detail',
+          builder: (context, state) {
+            final event =
+                state.extra as EventsModel; // 👈 cast to your event model type
+            return EventDetailScreen(model: event);
+          },
+        ),
 
-      GoRoute(
-        path: '/beverages',
-        builder: (context, state) => const BeveragesScreen(),
-      ),
-      GoRoute(
-        path: '/payment',
-        builder: (context, state) =>  PaymentMethodScreen(),
-      ),
-      GoRoute(
-        path: '/booking-confirmation',
-        builder: (context, state) => const BookingConfirmationScreen(),
-      ),
-       GoRoute(
-        path: '/booking-summary',
-        builder: (context, state) =>  BookingSummaryScreen(),
-      ),
+        GoRoute(
+          path: '/event-detail-one',
+          builder: (context, state) => const EventDetailsScreenOne(),
+        ),
+        GoRoute(
+          path: '/beverages',
+          builder: (context, state) => const BeveragesScreen(),
+        ),
+        GoRoute(
+          path: '/payment',
+          builder: (context, state) => PaymentMethodScreen(),
+        ),
+        GoRoute(
+          path: '/booking-confirmation',
+          builder: (context, state) =>  BookingConfirmationScreen(),
+        ),
+        GoRoute(
+          path: '/booking-summary',
+          builder: (context, state) => BookingSummaryScreen(),
+        ),
 
-      //shell routing
-      ShellRoute(
-        builder: (context, state, child) {
-          return LandingPage(child: child); // Use LandingPage as the shell
-        },
-        routes: [
-          // Main App Pages (after login)
-          GoRoute(
-            path: "/home",
-            builder: (context, state) => const HomeScreen(),
-          ),
-          GoRoute(
-            path: '/my-reservation',
-            builder: (context, state) => const MyReservationScreen(),
-          ),
-          GoRoute(
-            path: '/my-favorites',
-            builder: (context, state) => const FavouriteScreen(),
-          ),
-          GoRoute(
-            path: '/notification',
-            builder: (context, state) => const NotificationScreen(),
-          ),
-
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-        ],
-      ),
-    ],
-  );
+        // Shell routing for protected pages
+        ShellRoute(
+          builder: (context, state, child) => LandingPage(child: child),
+          routes: [
+            GoRoute(
+              path: "/home",
+              builder: (context, state) => const HomeScreen(),
+            ),
+            GoRoute(
+              path: '/my-reservation',
+              builder: (context, state) => const MyReservationScreen(),
+            ),
+            GoRoute(
+              path: '/my-favorites',
+              builder: (context, state) => const FavouriteScreen(),
+            ),
+            GoRoute(
+              path: '/notification',
+              builder: (context, state) => const NotificationScreen(),
+            ),
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }

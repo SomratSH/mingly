@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/screens/auth/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../../components/helpers.dart';
 
-class PasswordResetScreen extends StatefulWidget {
+class PasswordResetScreen extends StatelessWidget {
   const PasswordResetScreen({super.key});
-
-  @override
-  State<PasswordResetScreen> createState() => _PasswordResetScreenState();
-}
-
-class _PasswordResetScreenState extends State<PasswordResetScreen> {
-  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final provider = context.watch<AuthProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -49,7 +47,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
             ),
             const SizedBox(height: 8),
             PasswordInputField(
-              controller: TextEditingController(),
+              controller: provider.passwordController,
               hintText: 'Enter new password',
             ),
             const SizedBox(height: 24),
@@ -63,13 +61,33 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
             ),
             const SizedBox(height: 8),
             PasswordInputField(
-              controller: TextEditingController(),
+              controller: provider.retypePasswordController,
               hintText: 'Confirm new password',
             ),
             const SizedBox(height: 32),
-            PrimaryButton(text: 'Reset Password', onPressed: () {
-              context.go("/login");
-            }),
+            PrimaryButton(
+              text: 'Reset Password',
+              onPressed: () async {
+                LoadingDialog.show(context);
+                final status = await provider.resetPassword();
+                if (status["message"] != null) {
+                  LoadingDialog.hide(context);
+                  CustomSnackbar.show(
+                    context,
+                    message: status["message"],
+                    backgroundColor: Colors.green,
+                  );
+                  context.go("/login");
+                } else if (status["errors"] != null) {
+                  LoadingDialog.hide(context);
+                  CustomSnackbar.show(
+                    context,
+                    message: status["errors"],
+                    backgroundColor: Colors.red,
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mingly/src/components/custom_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -187,17 +188,17 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Language',
                 trailing: 'English',
               ),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
               _ProfileMenuItem(icon: Icons.settings, title: 'Account Settings'),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
               _ProfileMenuItem(icon: Icons.payment, title: 'Payment Method'),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
@@ -205,21 +206,25 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.book_online,
                 title: 'My Reservation',
               ),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
               _ProfileMenuItem(icon: Icons.history, title: 'Point History'),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
               _ProfileMenuItem(icon: Icons.card_giftcard, title: 'My Voucher'),
-         Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
-              _ProfileMenuItem(icon: Icons.logout, title: 'Log Out'),
+              _ProfileMenuItem(
+                icon: Icons.logout,
+                title: 'Log Out',
+                onTap: () => showLogoutDialog(context),
+              ),
               const SizedBox(height: 24),
               // Update Button
               SizedBox(
@@ -253,10 +258,12 @@ class _ProfileMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? trailing;
-  const _ProfileMenuItem({
+  Function()? onTap;
+  _ProfileMenuItem({
     required this.icon,
     required this.title,
     this.trailing,
+    this.onTap,
   });
 
   @override
@@ -264,10 +271,13 @@ class _ProfileMenuItem extends StatelessWidget {
     return Card(
       color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-     
+
       child: ListTile(
         leading: Icon(icon, color: Colors.white),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+        ),
         trailing: trailing != null
             ? Text(trailing!, style: const TextStyle(color: Colors.white70))
             : const Icon(
@@ -275,7 +285,7 @@ class _ProfileMenuItem extends StatelessWidget {
                 color: Colors.white,
                 size: 12,
               ),
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }

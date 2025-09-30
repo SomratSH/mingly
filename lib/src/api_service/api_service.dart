@@ -295,6 +295,12 @@ class ApiService {
       } catch (e) {
         return _handleError('Failed to parse response: $e');
       }
+    } else if (response.statusCode == 400 || response.statusCode == 401) {
+      try {
+        return json.decode(response.body); // Successfully decode the response
+      } catch (e) {
+        return _handleError('Failed to parse response: $e');
+      }
     } else {
       return _handleErrorForStatusCode(response.statusCode, response.body);
     }

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/application/events/model/events_model.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/helpers.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatelessWidget {
-  const EventDetailScreen({super.key});
+  EventsModel model;
+  EventDetailScreen({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final eventProvider = context.watch<EventsProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -16,7 +23,10 @@ class EventDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD1B26F)),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Waves & Raves', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          eventProvider.eventDetailsModel.eventName.toString(),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
@@ -50,12 +60,20 @@ class EventDetailScreen extends StatelessWidget {
                     Positioned(
                       left: 8,
                       top: 80,
-                      child: Icon(Icons.arrow_back_ios, color: Colors.white70, size: 24),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white70,
+                        size: 24,
+                      ),
                     ),
                     Positioned(
                       right: 8,
                       top: 80,
-                      child: Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 24),
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white70,
+                        size: 24,
+                      ),
                     ),
                     Positioned(
                       bottom: 8,
@@ -63,56 +81,88 @@ class EventDetailScreen extends StatelessWidget {
                       right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(5, (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: index == 0 ? Colors.white : Colors.white24,
-                            shape: BoxShape.circle,
+                        children: List.generate(
+                          5,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: index == 0 ? Colors.white : Colors.white24,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        )),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Seascape Music Festival', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+              Text(
+                model.eventName.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.location_on, color: Color(0xFFD1B26F), size: 18),
                   SizedBox(width: 4),
-                  Text('Singapore', style: TextStyle(color: Colors.white70)),
+                  Text(
+                    model.venueCity.toString(),
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
-                  Icon(Icons.calendar_today, color: Color(0xFFD1B26F), size: 18),
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    color: Color(0xFFD1B26F),
+                    size: 18,
+                  ),
                   SizedBox(width: 4),
-                  Text('27/04/2025', style: TextStyle(color: Colors.white70)),
+                  Text(
+                    eventProvider.eventDetailsModel.firstSessionDate.toString(),
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.access_time, color: Color(0xFFD1B26F), size: 18),
                   SizedBox(width: 4),
-                  Text('10:30 AM - 11:00 PM', style: TextStyle(color: Colors.white70)),
+                  Text(
+                    '${formatTimeToAmPm(eventProvider.eventDetailsModel.sessionStartTime.toString())} - ${formatTimeToAmPm(eventProvider.eventDetailsModel.sessionEndTime.toString())}',
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('Description', style: TextStyle(color: Color(0xFFD1B26F), fontWeight: FontWeight.bold)),
+              Text(
+                'Description',
+                style: TextStyle(
+                  color: Color(0xFFD1B26F),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 4),
-              const Text(
-                'Villagio restaurant and bar has one mission: to provide guests with a fine and fresh seafood experience. Featuring seasonal and sustainable seafood that is flown in fresh daily, our chef-driven menu proves that no matter when you\'re dining, seafood can ',
+              Text(
+                model.description.toString(),
                 style: TextStyle(color: Colors.white70),
               ),
               GestureDetector(
                 onTap: () {},
-                child: const Text('Read More...', style: TextStyle(color: Color(0xFFD1B26F), fontSize: 12)),
+                child: const Text(
+                  'Read More...',
+                  style: TextStyle(color: Color(0xFFD1B26F), fontSize: 12),
+                ),
               ),
               const SizedBox(height: 32),
               Row(
@@ -122,10 +172,21 @@ class EventDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD1B26F),
                       foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      LoadingDialog.show(context);
+                      await eventProvider.getEventTicketList(
+                        model.id.toString(),
+                      );
+
+                      LoadingDialog.hide(context);
                       context.push("/ticket-booking");
                     },
                     child: const Text('Book Ticket'),
@@ -134,8 +195,13 @@ class EventDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD1B26F),
                       foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
                     ),
                     onPressed: () {
                       context.push("/table-booking");

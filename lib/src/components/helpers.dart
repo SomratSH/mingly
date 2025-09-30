@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mingly/src/components/buttons.dart';
-
+import 'package:intl/intl.dart';
 import 'inputs.dart';
 
 /// A customizable primary button widget that displays a gradient background.
@@ -118,3 +118,25 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
   }
 }
 
+
+String formatTimeToAmPm(String time24) {
+  try {
+    // Parse input time (24-hour format)
+    DateTime dateTime = DateFormat("HH:mm:ss").parse(time24);
+
+    // Convert to 12-hour format with AM/PM
+    return DateFormat("hh:mm a").format(dateTime);
+  } catch (e) {
+    // In case of invalid input, return original
+    return time24;
+  }
+}
+
+String formatDate(String isoString) {
+  try {
+    DateTime dateTime = DateTime.parse(isoString).toLocal(); 
+    return DateFormat("dd MMM yyyy").format(dateTime);
+  } catch (e) {
+    return isoString; // fallback if invalid
+  }
+}

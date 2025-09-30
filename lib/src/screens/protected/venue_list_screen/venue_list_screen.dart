@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
+import 'package:provider/provider.dart';
 
 class VenueListScreen extends StatelessWidget {
   const VenueListScreen({super.key});
@@ -7,6 +9,7 @@ class VenueListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final venuesProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -25,18 +28,18 @@ class VenueListScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-           Container(
-             width: double.infinity,
-             decoration: ShapeDecoration(
-               shape: RoundedRectangleBorder(
-                 side: BorderSide(
-                   width: 0.20,
-                   strokeAlign: BorderSide.strokeAlignCenter,
-                   color: const Color(0xFFF7D99A),
-                 ),
-               ),
-             ),
-           ),
+            Container(
+              width: double.infinity,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 0.20,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: const Color(0xFFF7D99A),
+                  ),
+                ),
+              ),
+            ),
             Row(
               children: [
                 Expanded(
@@ -44,8 +47,32 @@ class VenueListScreen extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: 'Thailand',
                       items: const [
-                        DropdownMenuItem(value: 'Thailand', child: Row(children: [Icon(Icons.public, color: Color(0xFFD1B26F)), SizedBox(width: 8), Text('Thailand', style: TextStyle(color: Colors.white))])),
-                        DropdownMenuItem(value: 'Singapore', child: Row(children: [Icon(Icons.public, color: Color(0xFFD1B26F)), SizedBox(width: 8), Text('Singapore', style: TextStyle(color: Colors.white))])),
+                        DropdownMenuItem(
+                          value: 'Thailand',
+                          child: Row(
+                            children: [
+                              Icon(Icons.public, color: Color(0xFFD1B26F)),
+                              SizedBox(width: 8),
+                              Text(
+                                'Thailand',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Singapore',
+                          child: Row(
+                            children: [
+                              Icon(Icons.public, color: Color(0xFFD1B26F)),
+                              SizedBox(width: 8),
+                              Text(
+                                'Singapore',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                       onChanged: (value) {},
                       dropdownColor: Colors.grey.shade900,
@@ -58,9 +85,54 @@ class VenueListScreen extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: 'All cities',
                       items: const [
-                        DropdownMenuItem(value: 'All cities', child: Row(children: [Icon(Icons.location_city, color: Color(0xFFD1B26F)), SizedBox(width: 8), Text('All cities', style: TextStyle(color: Colors.white))])),
-                        DropdownMenuItem(value: 'Bangkok', child: Row(children: [Icon(Icons.location_city, color: Color(0xFFD1B26F)), SizedBox(width: 8), Text('Bangkok', style: TextStyle(color: Colors.white))])),
-                        DropdownMenuItem(value: 'Singapore', child: Row(children: [Icon(Icons.location_city, color: Color(0xFFD1B26F)), SizedBox(width: 8), Text('Singapore', style: TextStyle(color: Colors.white))])),
+                        DropdownMenuItem(
+                          value: 'All cities',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_city,
+                                color: Color(0xFFD1B26F),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'All cities',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Bangkok',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_city,
+                                color: Color(0xFFD1B26F),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Bangkok',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Singapore',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_city,
+                                color: Color(0xFFD1B26F),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Singapore',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                       onChanged: (value) {},
                       dropdownColor: Colors.grey.shade900,
@@ -70,18 +142,18 @@ class VenueListScreen extends StatelessWidget {
                 ),
               ],
             ),
-             Container(
-             width: double.infinity,
-             decoration: ShapeDecoration(
-               shape: RoundedRectangleBorder(
-                 side: BorderSide(
-                   width: 0.20,
-                   strokeAlign: BorderSide.strokeAlignCenter,
-                   color: const Color(0xFFF7D99A),
-                 ),
-               ),
-             ),
-           ),
+            Container(
+              width: double.infinity,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 0.20,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: const Color(0xFFF7D99A),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
             Container(
               decoration: BoxDecoration(
@@ -102,22 +174,18 @@ class VenueListScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Expanded(
               child: ListView(
-                children:  [
-                  _VenueCard(
+                children: List.generate(
+                  venuesProvider.venuesList.length,
+                  (index) => _VenueCard(
                     onTap: () => context.push("/venue-detail"),
                     image: 'lib/assets/images/dummy_event.png',
-                    title: 'Celavie',
-                    location: 'Singapore',
-                    time: '21:00 - 04:00',
+                    title: venuesProvider.venuesList[index].name.toString(),
+                    location: venuesProvider.venuesList[index].address
+                        .toString(),
+                    time:
+                        " ${venuesProvider.venuesList[index].openingHours![0].open.toString()} - ${venuesProvider.venuesList[index].openingHours![0].close.toString()}",
                   ),
-                  _VenueCard(
-                    onTap: () => context.push("/venue-detail"),
-                    image: 'lib/assets/images/dummy_event.png',
-                    title: '[MU;IN"]',
-                    location: 'Bangkok - thailand',
-                    time: '21:00 - 04:00',
-                  ),
-                ],
+                ),
               ),
             ),
           ],
@@ -146,19 +214,19 @@ class _VenueCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: InkWell(
-        onTap: onTap  ,
+        onTap: onTap,
         child: Card(
           color: Color(0xFF2E2D2C),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(8),
-                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   child: Image.asset(
                     image,
                     height: 140,
@@ -171,23 +239,39 @@ class _VenueCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(location, style: const TextStyle(color: Colors.white70)),
-                            Row(
-                        children: [
-                          const Icon(Icons.access_time, color: Colors.white54, size: 16),
-                          const SizedBox(width: 4),
-                          Text(time, style: const TextStyle(color: Colors.white70)),
-                        ],
-                      ),
+                          Text(
+                            location,
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time,
+                                color: Colors.white54,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                time,
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                    
                     ],
                   ),
                 ),

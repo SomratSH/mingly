@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:provider/provider.dart';
 
 class TableBookingScreen extends StatelessWidget {
   const TableBookingScreen({super.key});
@@ -8,6 +11,7 @@ class TableBookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final eventProvider = context.watch<EventsProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -17,8 +21,8 @@ class TableBookingScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          ' [Waves & Raves ] - Celvaie',
+        title: Text(
+          eventProvider.selectEventModel.eventName.toString(),
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -36,7 +40,7 @@ class TableBookingScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 8),
               Text(
-                '[Waves & Raves ] - Celvaie',
+                eventProvider.selectEventModel.eventName.toString(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -46,11 +50,11 @@ class TableBookingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.location_on, color: Color(0xFFD1B26F)),
                   SizedBox(width: 8),
                   Text(
-                    '3913 NE 163rd St',
+                    eventProvider.selectEventModel.venueCity.toString(),
                     style: TextStyle(color: Colors.white),
                   ),
                 ],
@@ -61,11 +65,11 @@ class TableBookingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.access_time, color: Color(0xFFD1B26F)),
                   SizedBox(width: 8),
                   Text(
-                    '10:30 AM - 11:00 PM',
+                    "  ${eventProvider.eventDetailsModel.sessionStartTime.toString()} - ${eventProvider.eventDetailsModel.sessionEndTime.toString()}",
                     style: TextStyle(color: Colors.white),
                   ),
                 ],
@@ -82,73 +86,80 @@ class TableBookingScreen extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.47,
-                      vertical: 8.37,
-                    ),
-                    decoration: ShapeDecoration(
-                      color: Colors.white.withValues(alpha: 0.13),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.23),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10.47,
-                      children: [
-                         Icon(Icons.access_time, color: Color(0xFFD1B26F)),
-                        Text(
-                          '12:15',
-                          style: TextStyle(
-                            color: const Color(0xFFCECECE),
-                            fontSize: 12.56,
-                            fontFamily: 'Segoe UI',
-                            fontWeight: FontWeight.w600,
-                            height: 1.67,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.47,
+                          vertical: 8.37,
+                        ),
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withValues(alpha: 0.13),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.23),
                           ),
                         ),
-                        Container(width: 10.47, height: 10.47, child: Stack()),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-              
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10.47,
-                      vertical: 8.37,
-                    ),
-                    decoration: ShapeDecoration(
-                      color: Colors.white.withValues(alpha: 0.13),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.23),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: 10.47,
+                          children: [
+                            Icon(Icons.access_time, color: Color(0xFFD1B26F)),
+                            Text(
+                              '12:15',
+                              style: TextStyle(
+                                color: const Color(0xFFCECECE),
+                                fontSize: 12.56,
+                                fontFamily: 'Segoe UI',
+                                fontWeight: FontWeight.w600,
+                                height: 1.67,
+                              ),
+                            ),
+                            Container(
+                              width: 10.47,
+                              height: 10.47,
+                              child: Stack(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 10.47,
-                      children: [
-                         Icon(Icons.group, color: Color(0xFFD1B26F)),
-                        Text(
-                          '2',
-                          style: TextStyle(
-                            color: const Color(0xFFCECECE),
-                            fontSize: 12.56,
-                            fontFamily: 'Segoe UI',
-                            fontWeight: FontWeight.w600,
-                            height: 1.67,
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.47,
+                          vertical: 8.37,
+                        ),
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withValues(alpha: 0.13),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.23),
                           ),
                         ),
-                        Container(width: 10.47, height: 10.47, child: Stack()),
-                      ],
-                    ),
-                  ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: 10.47,
+                          children: [
+                            Icon(Icons.group, color: Color(0xFFD1B26F)),
+                            Text(
+                              '2',
+                              style: TextStyle(
+                                color: const Color(0xFFCECECE),
+                                fontSize: 12.56,
+                                fontFamily: 'Segoe UI',
+                                fontWeight: FontWeight.w600,
+                                height: 1.67,
+                              ),
+                            ),
+                            Container(
+                              width: 10.47,
+                              height: 10.47,
+                              child: Stack(),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -160,8 +171,8 @@ class TableBookingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Villagio restaurant and bar has one mission: to provide guests with a fine and fresh seafood experience. Featuring seasonal and sustainable seafood that is flown in fresh daily, our chef-driven menu proves that no matter when you\'re dining, seafood can ',
+              Text(
+                eventProvider.eventDetailsModel.description.toString(),
                 style: TextStyle(color: Colors.white70),
               ),
               GestureDetector(
@@ -221,19 +232,18 @@ class TableBookingScreen extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  ...List.generate(27, (index) {
-                    final isAvailable = [
-                      2,
-                      5,
-                      10,
-                      11,
-                      14,
-                      22,
-                      24,
-                      26,
-                    ].contains(index + 1);
+                  ...List.generate(eventProvider.tableTicketModel.tables!.length, (
+                    index,
+                  ) {
+                    final table = eventProvider.tableTicketModel.tables![index];
+
+                    // Example: consider "available" if availabilityStatus == "available"
+                    final isAvailable = table.availabilityStatus == "available";
+
                     return _TableSlotButton(
-                      label: 'Table\n${(index + 1).toString().padLeft(2, '0')}',
+                      id: table.id!,
+                      label:
+                          'Table\n${(table.tcketNumber ?? index + 1).toString().padLeft(2, '0')}',
                       available: isAvailable,
                     );
                   }),
@@ -302,20 +312,41 @@ class _TimeSlotButton extends StatelessWidget {
 }
 
 class _TableSlotButton extends StatelessWidget {
+  final int id;
   final String label;
   final bool available;
-  const _TableSlotButton({required this.label, required this.available});
+  const _TableSlotButton({
+    required this.label,
+    required this.available,
+    required this.id,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final eventProvider = context.watch<EventsProvider>();
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: available ? Colors.green : Colors.red,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: eventProvider.tableBooking.seatId == id
+              ? BorderSide(color: Colors.white)
+              : BorderSide(color: Colors.transparent),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       ),
-      onPressed: () {},
+      onPressed: () {
+        if (available == false) {
+          CustomSnackbar.show(
+            context,
+            message: "Table already booked.",
+            backgroundColor: Colors.red,
+          );
+        } else if (available) {
+          eventProvider.selecteTableBooking(id, "17:00");
+        }
+      },
       child: Text(
         label,
         style: TextStyle(

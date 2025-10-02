@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/screens/protected/berverages/widget/menu_card.dart';
+import 'package:mingly/src/screens/protected/berverages/widget/table_card.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
 import 'package:provider/provider.dart';
 
-class BookingConfirmationScreen extends StatelessWidget {
-  const BookingConfirmationScreen({super.key});
+class TableBookingConfirmationScreen extends StatelessWidget {
+  const TableBookingConfirmationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-   
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
+    final bottleProvider = context.watch<BottleProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -32,44 +36,6 @@ class BookingConfirmationScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
-              const Text(
-                'Personal details',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Card(
-                color: Colors.grey.shade900,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  title: const Text(
-                    'Tyler Howell',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '1234567890',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      Text(
-                        'tyler.howell@gmail.com',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                  trailing: InkWell(
-                    onTap: () => context.push("/personal-info"),
-                    child: const Icon(Icons.chevron_right, color: Colors.white),
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
               Text(
                 eventProvider.selectEventModel.eventName.toString(),
@@ -112,74 +78,68 @@ class BookingConfirmationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Card(
-                color: Colors.grey.shade900,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: List.generate(
-                          eventProvider.selectedTickets.length,
-                          (index) {
-                            final ticket = eventProvider.selectedTickets[index];
-                            return Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Ticket  : ${eventProvider.getTicketName(int.parse(ticket.ticketId.toString()))}',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    Text(
-                                      eventProvider.getTicketPrice(
-                                        int.parse(ticket.ticketId),
-                                      ),
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${ticket.quantity} x',
-                                      style: TextStyle(color: Colors.white70),
-                                    ),
-                                    Text(
-                                      '${double.parse(eventProvider.getTicketPrice(int.parse(ticket.ticketId))) * double.parse(ticket.quantity.toString())}',
-                                      style: TextStyle(color: Colors.white70),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      const Divider(color: Colors.white24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Total', style: TextStyle(color: Colors.white)),
-                          Text(
-                            eventProvider.getTotalPrice(),
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ],
+              Row(
+                children: [
+                  SvgPicture.asset("lib/assets/icons/Menu.svg"),
+                  SizedBox(width: 10),
+                  Text(
+                    'Menu',
+                    style: TextStyle(
+                      color: const Color(0xFFFFFAE5),
+                      fontSize: 14,
+                      fontFamily: 'Lato',
+                      fontWeight: FontWeight.w500,
+                      height: 1.43,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Column(
+                children: List.generate(
+                  eventProvider.menuList.length,
+                  (index) => MenuCard(
+                    menuName: bottleProvider.getBottleName(
+                      eventProvider.menuList[index].id!,
+                    ),
+                    price: "\$100",
+                    quantity: eventProvider.menuList[index].quantity.toString(),
+                    subtotal: "\$300",
+                    onDelete: () {
+                      eventProvider.removeMenu(index);
+                    },
                   ),
                 ),
               ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  SvgPicture.asset("lib/assets/icons/Table.svg"),
+                  SizedBox(width: 10),
+                  Text(
+                    'Table',
+                    style: TextStyle(
+                      color: const Color(0xFFFFFAE5),
+                      fontSize: 14,
+                      fontFamily: 'Lato',
+                      fontWeight: FontWeight.w500,
+                      height: 1.43,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              TableCard(
+                no: eventProvider.tableBooking.seatId.toString(),
+                downPayment: "IDR 250,000",
+                minimumCharge: "IDR 230,000",
+                tableCount: "1",
+                totalDownPayment: "IDR 250,000",
+                onDelete: () {
+                  print("Deleted");
+                },
+              ),
+
               const SizedBox(height: 16),
               const Text(
                 'Promo Code',
@@ -199,9 +159,9 @@ class BookingConfirmationScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.grey.shade900,
-                        prefixIcon: const Icon(
-                          Icons.card_giftcard,
-                          color: Colors.white54,
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SvgPicture.asset("lib/assets/icons/Promo.svg"),
                         ),
                         hintText: 'Enter promo code',
                         hintStyle: const TextStyle(color: Colors.white54),
@@ -315,10 +275,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: () {
-                    eventProvider.buildOrderRequest(
-                      promoCode: eventProvider.promoCode!,
-                    );
-                    context.push("/payment");
+                    context.push("/booking-summary");
                   },
                   child: const Text('Proceed'),
                 ),
@@ -328,7 +285,5 @@ class BookingConfirmationScreen extends StatelessWidget {
         ),
       ),
     );
-  
-  
   }
 }

@@ -11,6 +11,7 @@ import 'package:mingly/src/screens/auth/welcome_screen/welcome_screen.dart'
     show WelcomeScreen;
 import 'package:mingly/src/screens/protected/berverages/beverages_screen.dart';
 import 'package:mingly/src/screens/protected/booking_confirmation_screen/booking_confirmation_screen.dart';
+import 'package:mingly/src/screens/protected/booking_confirmation_screen/table_booking_confirmation_screen.dart';
 import 'package:mingly/src/screens/protected/booking_summary/booking_summary.dart';
 import 'package:mingly/src/screens/protected/event_detail_screen/event_detail_screen.dart';
 import 'package:mingly/src/screens/protected/event_detail_screen/event_details_screen_one.dart';
@@ -25,6 +26,7 @@ import 'package:mingly/src/screens/protected/my_bottles/my_bottles_screen.dart';
 import 'package:mingly/src/screens/protected/my_reservation_screen/my_reservation_screen.dart';
 import 'package:mingly/src/screens/protected/notification_screen/notification_screen.dart';
 import 'package:mingly/src/screens/protected/payment/payment_screen.dart';
+import 'package:mingly/src/screens/protected/payment/payment_table.dart';
 import 'package:mingly/src/screens/protected/personal_info_screen/personal_info_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_screen.dart';
 import 'package:mingly/src/screens/protected/select_country_screen/select_country_screen.dart';
@@ -146,11 +148,19 @@ class AppRouter {
         ),
         GoRoute(
           path: '/booking-confirmation',
-          builder: (context, state) =>  BookingConfirmationScreen(),
+          builder: (context, state) => BookingConfirmationScreen(),
+        ),
+        GoRoute(
+          path: '/table-booking-confirmation',
+          builder: (context, state) => TableBookingConfirmationScreen(),
+        ),
+        GoRoute(
+          path: '/payment-table',
+          builder: (context, state) => PaymentTable(),
         ),
         GoRoute(
           path: '/booking-summary',
-          builder: (context, state) => BookingSummaryScreen(),
+          builder: (context, state) => BookingSummary(),
         ),
 
         // Shell routing for protected pages
@@ -183,3 +193,5 @@ class AppRouter {
     );
   }
 }
+
+class TTableBookingConfirmationScreen {}

@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/events/model/event_details_model.dart';
 import 'package:mingly/src/application/events/model/event_ticket_model.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
+import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +36,32 @@ class EventsRepo {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final response = await ApiService().postData(
       "${AppUrls.buyTicket}${id}/",
+      data,
+      authToken: preferences.getString("authToken"),
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> getTableTicket(
+    String eventId,
+    String date,
+    String selectedTime,
+  ) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final response = await ApiService().getData(
+      "${AppUrls.getTableTicket}$eventId/?date=$date&selected_time=$selectedTime",
+      authToken: preferences.getString("authToken"),
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> buyTableEventTicket(
+    Map<String, dynamic> data,
+    String id,
+  ) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final response = await ApiService().postData(
+      "${AppUrls.tableBook}${id}/",
       data,
       authToken: preferences.getString("authToken"),
     );

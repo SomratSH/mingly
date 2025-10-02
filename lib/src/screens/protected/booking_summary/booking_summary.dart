@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confirm_dialog.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:provider/provider.dart';
 
-class BookingSummaryScreen extends StatefulWidget {
-  @override
-  _BookingSummaryScreenState createState() => _BookingSummaryScreenState();
-}
-
-class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
-  final TextEditingController promoCodeController = TextEditingController();
+class BookingSummary extends StatelessWidget {
+  const BookingSummary({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final eventProvider = context.watch<EventsProvider>();
+    final bottleProvider = context.watch<BottleProvider>();
     return Scaffold(
       backgroundColor: Color(0xFF1A1A1A),
       appBar: AppBar(
@@ -59,7 +61,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("[Event]"),
+                Text(eventProvider.selectEventModel.eventName.toString()),
                 SizedBox(height: 14),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +76,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          'Open gate at 20:00',
+                          'Open gate at ${formatDate(eventProvider.eventDetailsModel.sessionStartTime.toString())}',
                           style: TextStyle(
                             color: const Color(0xFFB1A39E),
                             fontSize: 12,
@@ -125,7 +127,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                       children: [
                         Text('Outlet', style: TextStyle(color: Colors.white)),
                         Text(
-                          '[Address]\nCity - Country',
+                          '${eventProvider.eventDetailsModel.city}\nCity - Country',
                           style: TextStyle(
                             color: const Color(0xFFB1A39E),
                             fontSize: 12,
@@ -182,36 +184,47 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
 
             Container(
               width: double.infinity,
-
-              decoration: BoxDecoration(color: const Color(0xFF2E2D2C)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14.0,
-                      vertical: 10,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              decoration: const BoxDecoration(color: Color(0xFF2E2D2C)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14.0,
+                  vertical: 10,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("No                      : s-32"),
-                        Text("Full Payment      : \$15.00"),
-                        Text("Minimun Charge : \$20.00"),
-                        SizedBox(height: 10),
-                        Text("Tax                      : \$3.00"),
-                        Text("Price Per Tax       : \$10.00"),
-                        Divider(),
-                        Text("No                      : s-32"),
-                        Text("Full Payment      : \$15.00"),
-                        Text("Minimun Charge : \$20.00"),
-                        SizedBox(height: 10),
-                        Text("Tax                      : \$3.00"),
-                        Text("Price Per Tax       : \$10.00"),
+                        const Text("No :"),
+                        Text("${eventProvider.tableBooking.seatId}"),
                       ],
                     ),
-                  ),
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [Text("Full Payment :"), Text("\$15.00")],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text("Minimum Charge :"),
+                        Text("\$20.00"),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [Text("Tax :"), Text("\$3.00")],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text("Price Per Tax :"),
+                        Text("\$10.00"),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -247,31 +260,33 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("[Menu]"),
-
-                        Text("Price           : \$15.00"),
-                        Text("Quantity     : \$20.00"),
-                        Text("Subtotal     : \$20.00"),
-                        Divider(),
-
-                        Text("Price           : \$15.00"),
-                        Text("Quantity     : \$20.00"),
-                        Text("Subtotal     : \$20.00"),
-                      ],
+                      children: List.generate(
+                        eventProvider.menuList.length,
+                        (index) => Column(
+                          children: [
+                            MenuItemCard(
+                              menuName: bottleProvider.getBottleName(
+                                eventProvider.menuList[index].id!,
+                              ),
+                              price: "\$15.00",
+                              quantity: "2",
+                              subtotal: "\$30.00",
+                            ),
+                            if (index != eventProvider.menuList.length - 1)
+                              Divider(),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-          
-
-            SizedBox(height: 24),
-
+            // SizedBox(height: 24),
+            //
             // Promo Code Section
-            _buildPromoCodeSection(),
-
+            // _buildPromoCodeSection(),
             SizedBox(height: 24),
 
             // Total Summary Section
@@ -281,8 +296,9 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
 
             // Full Payment Button
             InkWell(
-              onTap: () => showCustomConfirmDialog(context),
-              child: _buildPaymentButton()),
+              onTap: () => context.push("/payment-table"),
+              child: _buildPaymentButton(),
+            ),
 
             SizedBox(height: 20),
           ],
@@ -290,309 +306,334 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
       ),
     );
   }
+}
 
-  Widget _buildStatusSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Status - Pending',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+Widget _buildStatusSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Status - Pending',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-        SizedBox(height: 4),
-        Text(
-          'Your payment is being processed by the system.',
-          style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+      ),
+      SizedBox(height: 4),
+      Text(
+        'Your payment is being processed by the system.',
+        style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+      ),
+    ],
+  );
+}
+
+Widget _buildUserInfoSection() {
+  return _buildInfoCard([
+    _buildInfoRow(Icons.person, 'Tyler Howell', 'Booker (VIP)', null),
+    _buildInfoRow(Icons.phone, '1 234567890', null, null),
+    _buildInfoRow(Icons.email, 'tyler.howell@gmail.com', null, null),
+  ]);
+}
+
+Widget _buildPromoCodeSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Promo Code',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
         ),
-      ],
-    );
-  }
-
-  Widget _buildUserInfoSection() {
-    return _buildInfoCard([
-      _buildInfoRow(Icons.person, 'Tyler Howell', 'Booker (VIP)', null),
-      _buildInfoRow(Icons.phone, '1 234567890', null, null),
-      _buildInfoRow(Icons.email, 'tyler.howell@gmail.com', null, null),
-    ]);
-  }
-
-  
-
- 
-
-  
-
-  Widget _buildPromoCodeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Promo Code',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                height: 48,
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade600),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.local_offer,
-                      color: Colors.grey.shade400,
-                      size: 20,
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: promoCodeController,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: 'Enter promo code',
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(width: 12),
-            Container(
+      ),
+      SizedBox(height: 12),
+      Row(
+        children: [
+          Expanded(
+            child: Container(
               height: 48,
-              padding: EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Color(0xFF2A2A2A),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white),
+                border: Border.all(color: Colors.grey.shade600),
               ),
-              child: Center(
-                child: Text(
-                  'Apply',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.local_offer,
+                    color: Colors.grey.shade400,
+                    size: 20,
                   ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Enter promo code',
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          Container(
+            height: 48,
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            decoration: BoxDecoration(
+              color: Color(0xFF2A2A2A),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white),
+            ),
+            child: Center(
+              child: Text(
+                'Apply',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+Widget _buildTotalSummarySection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildInfoCard([
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Promo',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 1,
+                fontWeight: FontWeight.w200,
+              ),
+            ),
+            Text(
+              '-',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w200,
+              ),
+            ),
           ],
         ),
-      ],
-    );
-  }
+        _buildPriceRow('Subtotal', '', '\$15.00'),
+        SizedBox(height: 8),
+        Divider(color: Colors.grey.shade600, height: 1),
+        SizedBox(height: 8),
+        _buildPriceRow('Grand Total', '', '\$15.00', isTotal: true),
+      ]),
+    ],
+  );
+}
 
-  Widget _buildTotalSummarySection() {
-    return Column(
+Widget _buildPaymentButton() {
+  return Container(
+    width: double.infinity,
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+      // borderRadius: BorderRadius.circular(12),
+      // border: Border.all(color: Colors.white),
+    ),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Full Payment                    \$15.00',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildInfoCard(List<Widget> children) {
+  return Container(
+    padding: EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Color(0xFF2A2A2A),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    ),
+  );
+}
+
+Widget _buildInfoRow(
+  IconData? icon,
+  String title,
+  String? subtitle,
+  String? trailing,
+) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 4),
+    child: Row(
       children: [
-       
-       
-        _buildInfoCard([
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        if (icon != null) ...[
+          Icon(icon, color: Colors.grey.shade400, size: 20),
+          SizedBox(width: 12),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(
-          'Promo',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 1,
-            fontWeight: FontWeight.w200,
-          ),
-        ),
-         Text(
-          '-',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w200,
-          ),
-        ),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              if (subtitle != null) ...[
+                SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                ),
+              ],
             ],
           ),
-          _buildPriceRow('Subtotal', '', '\$15.00'),
-          SizedBox(height: 8),
-          Divider(color: Colors.grey.shade600, height: 1),
-          SizedBox(height: 8),
-          _buildPriceRow('Grand Total', '', '\$15.00', isTotal: true),
-        ]),
-      ],
-    );
-  }
-
-  Widget _buildPaymentButton() {
-    return Container(
-      width: double.infinity,
-      
-      decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.circular(12),
-        // border: Border.all(color: Colors.white),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Full Payment                    \$15.00',
+        ),
+        if (trailing != null)
+          Text(
+            trailing,
             style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 
-  Widget _buildInfoCard(List<Widget> children) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
+Widget _buildSectionHeader(String title) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8),
+    child: Text(
+      title,
+      style: TextStyle(
+        color: Colors.grey.shade300,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildInfoRow(
-    IconData? icon,
-    String title,
-    String? subtitle,
-    String? trailing,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            Icon(icon, color: Colors.grey.shade400, size: 20),
-            SizedBox(width: 12),
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+Widget _buildPriceRow(
+  String title,
+  String subtitle,
+  String price, {
+  bool isTotal = false,
+}) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (title.isNotEmpty)
                 Text(
                   title,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: isTotal ? 16 : 14,
+                    fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
                   ),
                 ),
-                if (subtitle != null) ...[
-                  SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-                  ),
-                ],
+              if (subtitle.isNotEmpty) ...[
+                SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                ),
               ],
-            ),
+            ],
           ),
-          if (trailing != null)
-            Text(
-              trailing,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Colors.grey.shade300,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
         ),
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(
-    String title,
-    String subtitle,
-    String price, {
-    bool isTotal = false,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (title.isNotEmpty)
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: isTotal ? 16 : 14,
-                      fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-                    ),
-                  ),
-                if (subtitle.isNotEmpty) ...[
-                  SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-                  ),
-                ],
-              ],
+        if (price.isNotEmpty)
+          Text(
+            price,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
             ),
           ),
-          if (price.isNotEmpty)
-            Text(
-              price,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: isTotal ? 16 : 14,
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    promoCodeController.dispose();
-    super.dispose();
-  }
+      ],
+    ),
+  );
 }
 
-// Example usage in main.dart:
+class MenuItemCard extends StatelessWidget {
+  final String menuName;
+  final String price;
+  final String quantity;
+  final String subtotal;
+
+  const MenuItemCard({
+    super.key,
+    required this.menuName,
+    required this.price,
+    required this.quantity,
+    required this.subtotal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$menuName",
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 4),
+        _buildRow("Price :", price),
+        _buildRow("Quantity :", quantity),
+        _buildRow("Subtotal :", subtotal),
+      ],
+    );
+  }
+
+  Widget _buildRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}

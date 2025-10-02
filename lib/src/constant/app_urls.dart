@@ -20,4 +20,8 @@ class AppUrls {
 
   //bottles
   static String getBottle = "/all-bottles/";
+
+  //tables and sofa ticket list
+  static String getTableTicket = "/table-availability/";
+  static String tableBook = "/book-table/";
 }

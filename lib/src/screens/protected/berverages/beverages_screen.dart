@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/beverage_item_card.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mingly/src/screens/protected/berverages/widget/beverage_item_card.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:provider/provider.dart';
 
-class BeveragesScreen extends StatefulWidget {
+class BeveragesScreen extends StatelessWidget {
   const BeveragesScreen({super.key});
 
   @override
-  State<BeveragesScreen> createState() => _BeveragesScreenState();
-}
-
-class _BeveragesScreenState extends State<BeveragesScreen> {
-  String? selectedCategory;
-  final List<String> categories = [
-    'Coffee',
-    'Tea',
-    'Juice',
-    'Soft Drinks',
-    'Smoothies',
-  ];
-
-  final TextEditingController searchController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
+    final eventProvider = context.watch<EventsProvider>();
+    final bottleProvider = context.watch<BottleProvider>();
+
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -40,15 +35,15 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
               const SizedBox(height: 10),
 
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: const Color(0xFF2E2D2C),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    dropdownColor: const Color(0xFF2E2D2C),
-                    value: selectedCategory,
+                    dropdownColor: Color(0xFF2E2D2C),
+                    value: eventProvider.selectedCategory,
                     hint: const Text(
                       "Select Category",
                       style: TextStyle(
@@ -63,7 +58,7 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
                       color: Colors.white,
                     ),
                     isExpanded: true,
-                    items: categories.map((String category) {
+                    items: eventProvider.categories.map((String category) {
                       return DropdownMenuItem<String>(
                         value: category,
                         child: Text(
@@ -73,15 +68,13 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
                       );
                     }).toList(),
                     onChanged: (String? value) {
-                      setState(() {
-                        selectedCategory = value;
-                      });
+                      eventProvider.updateCatagory(value);
                     },
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               Container(
                 decoration: BoxDecoration(
@@ -89,7 +82,7 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
                   borderRadius: BorderRadius.circular(7.12),
                 ),
                 child: TextField(
-                  controller: searchController,
+                  controller: TextEditingController(),
                   style: const TextStyle(color: Colors.white),
                   cursorColor: Colors.white, // make cursor visible
                   decoration: const InputDecoration(
@@ -112,52 +105,38 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              BeverageItemCard(
-                imagePath: "lib/assets/images/bottle_one.jpg",
-                title: "3 Champagne",
-                number: "No.123",
-                keepingDate: "12 Jan 2025",
-                expiryDate: "12 Dec 2025",
-                buttonText: "Add",
-                onTap: () {
-                  print("Add button clicked!");
-                },
-              ),
-              SizedBox(height: 10),
-              BeverageItemCard(
-                imagePath: "lib/assets/images/bottle_two.jpg",
-                title: "3 Champagne",
-                number: "No.123",
-                keepingDate: "12 Jan 2025",
-                expiryDate: "12 Dec 2025",
-                buttonText: "Add",
-                onTap: () {
-                  print("Add button clicked!");
-                },
-              ),
-              SizedBox(height: 10),
-              BeverageItemCard(
-                imagePath: "lib/assets/images/bottle_three.jpg",
-                title: "3 Champagne",
-                number: "No.123",
-                keepingDate: "12 Jan 2025",
-                expiryDate: "12 Dec 2025",
-                buttonText: "Add",
-                onTap: () {
-                  print("Add button clicked!");
-                },
-              ),
-              SizedBox(height: 10),
-              BeverageItemCard(
-                imagePath: "lib/assets/images/bottle_four.jpg",
-                title: "3 Champagne",
-                number: "No.123",
-                keepingDate: "12 Jan 2025",
-                expiryDate: "12 Dec 2025",
-                buttonText: "Add",
-                onTap: () {
-                  print("Add button clicked!");
-                },
+              Column(
+                children: List.generate(
+                  bottleProvider.bottleList.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: BeverageItemCard(
+                      imagePath: "lib/assets/images/bottle_one.jpg",
+                      title: bottleProvider.bottleList[index].brand.toString(),
+                      number:
+                          "Qty - ${bottleProvider.bottleList[index].quantity.toString()}",
+                      keepingDate: formatDate(
+                        bottleProvider.bottleList[index].keepingDate.toString(),
+                      ),
+                      expiryDate: formatDate(
+                        bottleProvider.bottleList[index].expiredDate.toString(),
+                      ),
+                      buttonText: "Add",
+                      onTap: () {
+                        eventProvider.addMenu(
+                          bottleProvider.bottleList[index].id!,
+                          1,
+                        );
+                        CustomSnackbar.show(
+                          context,
+                          message: "Added menu sucessfully",
+                          backgroundColor: Colors.green,
+                        );
+                        print("Add button clicked!");
+                      },
+                    ),
+                  ),
+                ),
               ),
 
               Spacer(),
@@ -173,9 +152,9 @@ class _BeveragesScreenState extends State<BeveragesScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   onPressed: () {
-                    context.push("/payment");
+                    context.push("/table-booking-confirmation");
                   },
-                  child: const Text('Next(2 items)'),
+                  child: Text('Next(${eventProvider.menuList.length} items)'),
                 ),
               ),
             ],

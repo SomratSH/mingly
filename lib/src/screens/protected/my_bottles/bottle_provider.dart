@@ -14,4 +14,19 @@ class BottleProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  String? selectedCategory;
+  final List<String> categories = [
+    'Coffee',
+    'Tea',
+    'Juice',
+    'Soft Drinks',
+    'Smoothies',
+  ];
+
+  String getBottleName(int id) {
+    return bottleList.firstWhere((e) => e.id == id).brand.toString();
+  }
+
+  
 }

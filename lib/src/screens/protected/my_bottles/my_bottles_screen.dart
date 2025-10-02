@@ -61,15 +61,18 @@ class MyBottlesScreen extends StatelessWidget {
           Column(
             children: List.generate(
               bottleProvider.bottleList.length,
-              (index) => MyBottleCard(
-                imagePath: "lib/assets/images/bottle_one.jpg",
-                title: bottleProvider.bottleList[index].brand.toString(),
-                number: bottleProvider.bottleList[index].quantity.toString(),
-                keepingDate: formatDate(
-                  bottleProvider.bottleList[index].keepingDate.toString(),
-                ),
-                expiryDate: formatDate(
-                  bottleProvider.bottleList[index].expiredDate.toString(),
+              (index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MyBottleCard(
+                  imagePath: "lib/assets/images/bottle_one.jpg",
+                  title: bottleProvider.bottleList[index].brand.toString(),
+                  number: bottleProvider.bottleList[index].quantity.toString(),
+                  keepingDate: formatDate(
+                    bottleProvider.bottleList[index].keepingDate.toString(),
+                  ),
+                  expiryDate: formatDate(
+                    bottleProvider.bottleList[index].expiredDate.toString(),
+                  ),
                 ),
               ),
             ),

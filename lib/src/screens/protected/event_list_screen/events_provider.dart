@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:mingly/src/application/events/model/event_details_model.dart';
 import 'package:mingly/src/application/events/model/event_ticket_model.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
+import 'package:mingly/src/application/events/model/menu_booking_model.dart';
+import 'package:mingly/src/application/events/model/table_order_model.dart';
+import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/application/events/model/ticket_order_model.dart';
 import 'package:mingly/src/application/events/repo/events_repo.dart';
 
@@ -165,6 +170,64 @@ class EventsProvider extends ChangeNotifier {
     id,
   ) async {
     final response = await EventsRepo().buyEventTicket(data, id);
+    return response;
+  }
+
+  //event table ticket list
+  TableTicketModel tableTicketModel = TableTicketModel();
+  Future<void> getTableTicketList() async {
+    final response = await EventsRepo().getTableTicket(
+      selectEventModel.id.toString(),
+      "2025-04-30",
+      "17:00",
+    );
+    if (response.isNotEmpty) {
+      tableTicketModel = TableTicketModel.fromJson(response);
+      notifyListeners();
+    }
+  }
+
+  String? selectedCategory;
+  final List<String> categories = [
+    'Coffee',
+    'Tea',
+    'Juice',
+    'Soft Drinks',
+    'Smoothies',
+  ];
+
+  void updateCatagory(String? value) {
+    selectedCategory = value;
+    notifyListeners();
+  }
+
+  TableBooking tableBooking = TableBooking();
+
+  void selecteTableBooking(int tableid, String selectedTime) {
+    tableBooking = TableBooking();
+    tableBooking = TableBooking(seatId: tableid, selectedTime: selectedTime);
+    notifyListeners();
+  }
+
+  List<MenuBookingModel> menuList = [];
+
+  addMenu(int id, int qty) {
+    menuList.add(MenuBookingModel(id, qty));
+    notifyListeners();
+  }
+
+  removeMenu(int index) {
+    if (menuList.isNotEmpty) {
+      menuList.removeAt(index);
+    }
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> buyTableTicketEvent(
+    Map<String, dynamic> data,
+    id,
+  ) async {
+    final response = await EventsRepo().buyTableEventTicket(data, id);
     return response;
   }
 }

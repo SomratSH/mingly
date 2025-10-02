@@ -203,7 +203,10 @@ class EventDetailScreen extends StatelessWidget {
                         vertical: 16,
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      LoadingDialog.show(context);
+                      await eventProvider.getTableTicketList();
+                      LoadingDialog.hide(context);
                       context.push("/table-booking");
                     },
                     child: const Text('Sofa & Table'),

@@ -9,6 +9,13 @@ class AppUrls {
   static String forgotPassword = "/auth/forget-password/";
   static String resetPassword = "/auth/reset-password/";
 
+  //profile
+  static String profile = "/profile/";
+  static String profileUpdate = "/profile/update/";
+
+  //event join
+  static String joinEvent = "/events/";
+
   //venues
   static String venuesUrl = "/all-venues/";
 

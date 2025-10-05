@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TableCard extends StatelessWidget {
-  final String no;
+  final List<String> no;
   final String downPayment;
   final String minimumCharge;
   final String tableCount;
@@ -33,7 +33,17 @@ class TableCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildRow("No :", no),
+                Row(
+                  children: [
+                    Text("No : "),
+                    Row(
+                      children: List.generate(
+                        no.length,
+                        (index) => Text("${no[index]} "),
+                      ),
+                    ),
+                  ],
+                ),
                 _buildRow("Down Payment:", downPayment),
                 _buildRow("Minimum Charge :", minimumCharge),
                 const SizedBox(height: 20),
@@ -72,6 +82,7 @@ class TableCard extends StatelessWidget {
             height: 1.43,
           ),
         ),
+
         Text(value, style: const TextStyle(color: Colors.white)),
       ],
     );

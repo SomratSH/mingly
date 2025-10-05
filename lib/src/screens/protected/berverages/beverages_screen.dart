@@ -20,7 +20,10 @@ class BeveragesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.arrow_back_ios, color: Colors.white),
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.arrow_back_ios, color: Colors.white),
+        ),
         title: const Text(
           'Menu (Optional)',
           style: TextStyle(color: Colors.white),

@@ -4,8 +4,12 @@ class TableTicketModel {
   String? slotEnd;
   SessionInfo? sessionInfo;
 
-  TableTicketModel(
-      {this.tables, this.slotStart, this.slotEnd, this.sessionInfo});
+  TableTicketModel({
+    this.tables,
+    this.slotStart,
+    this.slotEnd,
+    this.sessionInfo,
+  });
 
   TableTicketModel.fromJson(Map<String, dynamic> json) {
     if (json['tables'] != null) {
@@ -45,17 +49,20 @@ class Tables {
   double? w;
   double? h;
   String? shape;
+  List<String>? chairs;
 
-  Tables(
-      {this.id,
-      this.seatStatus,
-      this.availabilityStatus,
-      this.tcketNumber,
-      this.x,
-      this.y,
-      this.w,
-      this.h,
-      this.shape});
+  Tables({
+    this.id,
+    this.seatStatus,
+    this.availabilityStatus,
+    this.tcketNumber,
+    this.x,
+    this.y,
+    this.w,
+    this.h,
+    this.shape,
+    this.chairs,
+  });
 
   Tables.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -67,6 +74,7 @@ class Tables {
     w = json['w'];
     h = json['h'];
     shape = json['shape'];
+    chairs = json['chairs'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
@@ -80,6 +88,7 @@ class Tables {
     data['w'] = this.w;
     data['h'] = this.h;
     data['shape'] = this.shape;
+    data['chairs'] = this.chairs;
     return data;
   }
 }

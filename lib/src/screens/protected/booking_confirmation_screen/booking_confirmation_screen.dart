@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confirm_dialog.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/payment/payment_strrpe.dart';
+import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
 import 'package:provider/provider.dart';
 
 class BookingConfirmationScreen extends StatelessWidget {
@@ -8,9 +13,9 @@ class BookingConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
+    final profileProvider = context.watch<ProfileProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -41,35 +46,43 @@ class BookingConfirmationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Card(
-                color: Colors.grey.shade900,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  title: const Text(
-                    'Tyler Howell',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '1234567890',
-                        style: TextStyle(color: Colors.white70),
+              profileProvider.profileModel == null ||
+                      profileProvider.profileModel.data == null
+                  ? Center(child: CircularProgressIndicator())
+                  : Card(
+                      color: Colors.grey.shade900,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Text(
-                        'tyler.howell@gmail.com',
-                        style: TextStyle(color: Colors.white70),
+                      child: ListTile(
+                        title: Text(
+                          profileProvider.profileModel.data!.fullName
+                              .toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profileProvider.profileModel.data!.mobile
+                                  .toString(),
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            Text(
+                              'tyler.howell@gmail.com',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                        trailing: InkWell(
+                          onTap: () => context.push("/personal-info"),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  trailing: InkWell(
-                    onTap: () => context.push("/personal-info"),
-                    child: const Icon(Icons.chevron_right, color: Colors.white),
-                  ),
-                ),
-              ),
+                    ),
               const SizedBox(height: 16),
               Text(
                 eventProvider.selectEventModel.eventName.toString(),
@@ -314,11 +327,74 @@ class BookingConfirmationScreen extends StatelessWidget {
                     ),
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
-                    eventProvider.buildOrderRequest(
-                      promoCode: eventProvider.promoCode!,
+                  onPressed: () async {
+                    LoadingDialog.show(context);
+                    final status = await eventProvider.buyTicketEvent(
+                      eventProvider
+                          .buildOrderRequest(
+                            promoCode: eventProvider.promoCode ?? "",
+                          )
+                          .toJson(),
+                      eventProvider.selectEventModel.id.toString(),
                     );
-                    context.push("/payment");
+                    LoadingDialog.hide(context);
+
+                    if (status["message"] == "Booking Successful" &&
+                        status["checkout_url"] != null) {
+                      // Navigate to payment
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StripePaymentWebView(
+                            url: status["checkout_url"],
+                            message: status["message"],
+                          ),
+                        ),
+                      ).then((success) {
+                        if (success == true) {
+                          showCustomConfirmDialogEventTicket(
+                            context,
+                            context
+                                .read<EventsProvider>()
+                                .selectedTickets
+                                .length
+                                .toString(),
+                            status["message"],
+                          );
+                        }
+                      });
+
+                      // showCustomConfirmDialogEventTicket(
+                      //   context,
+                      //   eventProvider.selectedTickets.length.toString(),
+                      //   "table booking successfully",
+                      // );
+
+                      //           Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(
+                      //               builder: (_) => StripePaymentWebView(
+                      //                 url: status["checkout_url"],
+                      //                 message: status["message"],
+                      //               ),
+                      //             ),
+                      //           );
+
+                      //             showCustomConfirmDialogEventTicket(
+                      //   context,
+                      //   context.read<EventsProvider>().selectedTickets.length.toString(),
+                      //   widget.message!,
+                      // );
+                    } else {
+                      CustomSnackbar.show(
+                        context,
+                        message: "Getting some error",
+                        backgroundColor: Colors.red,
+                      );
+                    }
+                    // if (status != null) {
+                    //
+                    // }
                   },
                   child: const Text('Proceed'),
                 ),
@@ -328,7 +404,5 @@ class BookingConfirmationScreen extends StatelessWidget {
         ),
       ),
     );
-  
-  
   }
 }

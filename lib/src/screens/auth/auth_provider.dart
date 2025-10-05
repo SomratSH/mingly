@@ -76,6 +76,7 @@ class AuthProvider extends ChangeNotifier {
     final response = await AuthenticationRepo(ApiService()).login({
       "email": emailController.text,
       "password": passwordController.text,
+      "device_token": "test-token-12345",
     });
     if (response["message"] != null) {
       prefs.setString('authToken', response["access_token"]);

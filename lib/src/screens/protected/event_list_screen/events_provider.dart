@@ -187,6 +187,10 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
+  List<String> getChair(int id) {
+    return tableTicketModel.tables!.firstWhere((e) => e.id == id).chairs!;
+  }
+
   String? selectedCategory;
   final List<String> categories = [
     'Coffee',

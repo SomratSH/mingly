@@ -130,7 +130,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
               ),
               SizedBox(height: 10),
               TableCard(
-                no: eventProvider.tableBooking.seatId.toString(),
+                no: eventProvider.getChair(eventProvider.tableBooking.seatId!),
                 downPayment: "IDR 250,000",
                 minimumCharge: "IDR 230,000",
                 tableCount: "1",

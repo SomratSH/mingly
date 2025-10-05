@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confirm_dialog.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:mingly/src/screens/protected/payment/payment_stripe_table.dart';
 import 'package:provider/provider.dart';
 
 class BookingSummary extends StatelessWidget {
@@ -296,7 +299,38 @@ class BookingSummary extends StatelessWidget {
 
             // Full Payment Button
             InkWell(
-              onTap: () => context.push("/payment-table"),
+              onTap: () async {
+                LoadingDialog.show(context);
+                final status = await eventProvider.buyTableTicketEvent(
+                  eventProvider.tableBooking.toJson(),
+                  eventProvider.selectEventModel.id.toString(),
+                );
+                LoadingDialog.hide(context);
+
+                if (status["success"] == true &&
+                    status["checkout_url"] != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StripePaymentWebViewTable(
+                        url: status["checkout_url"],
+                      ),
+                    ),
+                  ).then((e) {
+                    showCustomConfirmDialogEventTicket(
+                      context,
+                      eventProvider.selectedTickets.length.toString(),
+                      "table booking successfully",
+                    );
+                  });
+                } else {
+                  CustomSnackbar.show(
+                    context,
+                    message: "Getting some error",
+                    backgroundColor: Colors.red,
+                  );
+                }
+              },
               child: _buildPaymentButton(),
             ),
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_dialog.dart';
+import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -8,6 +11,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profileProvider = context.watch<ProfileProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
@@ -22,55 +26,61 @@ class ProfileScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
             children: [
               // Profile Card
-              Card(
-                color: Color(0xFF2E2D2C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: Color(0xFFFFFAE5), width: 0.5),
-                ),
-
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 28,
-                    child: Image.asset("lib/assets/images/pp.png"),
-                  ),
-                  title: Text(
-                    'Tyler Howell',
-                    style: TextStyle(
-                      color: const Color(0xFFFFFAE5),
-                      fontSize: 16,
-                      fontFamily: 'Lato',
-                      fontWeight: FontWeight.w500,
-                      height: 1.75,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '+1234567890',
-                    style: TextStyle(
-                      color: const Color(0xFFFAE7E7),
-                      fontSize: 14,
-                      fontFamily: 'Lato',
-                      fontWeight: FontWeight.w500,
-                      height: 1.43,
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        'Edit Profile',
-                        style: TextStyle(color: Colors.white),
+              profileProvider.profileModel == null ||
+                      profileProvider.profileModel.data == null
+                  ? Center(child: CircularProgressIndicator())
+                  : Card(
+                      color: Color(0xFF2E2D2C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Color(0xFFFFFAE5), width: 0.5),
                       ),
-                      SizedBox(width: 10),
-                      Icon(Icons.edit, color: Colors.white, size: 18),
-                    ],
-                  ),
-                ),
-              ),
+
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          radius: 28,
+                          child: Image.asset("lib/assets/images/pp.png"),
+                        ),
+                        title: Text(
+                          profileProvider.profileModel.data!.fullName ?? "N/A",
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAE5),
+                            fontSize: 16,
+                            fontFamily: 'Lato',
+                            fontWeight: FontWeight.w500,
+                            height: 1.75,
+                          ),
+                        ),
+                        subtitle: Text(
+                          profileProvider.profileModel.data!.mobile ?? "N/A",
+                          style: TextStyle(
+                            color: const Color(0xFFFAE7E7),
+                            fontSize: 14,
+                            fontFamily: 'Lato',
+                            fontWeight: FontWeight.w500,
+                            height: 1.43,
+                          ),
+                        ),
+                        trailing: InkWell(
+                          onTap: () => context.push("/edit-profile"),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                'Edit Profile',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              SizedBox(width: 10),
+                              Icon(Icons.edit, color: Colors.white, size: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
               const SizedBox(height: 16),
               // Membership Status Card
               Card(
@@ -91,9 +101,13 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
-                            'Silver',
+                            profileProvider
+                                    .profileModel
+                                    .data!
+                                    .membershipStatus ??
+                                "N/A",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -101,7 +115,9 @@ class ProfileScreen extends StatelessWidget {
                           ),
 
                           Text(
-                            '87,400 Points',
+                            profileProvider.profileModel.data!.points
+                                    .toString() ??
+                                "0",
                             style: TextStyle(color: Colors.white70),
                           ),
                         ],
@@ -115,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '500,000 /',
+                            '${profileProvider.profileModel.data!.currentPoints} /',
                             style: TextStyle(
                               color: const Color(0xFFFFFAE5),
                               fontSize: 24,
@@ -125,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '1,500,000 IDR',
+                            '${profileProvider.profileModel.data!.targetPoints} IDR',
                             style: TextStyle(
                               color: const Color(0xFFB1A39E),
                               fontSize: 12,

@@ -5,6 +5,7 @@ import 'package:mingly/src/application/events/model/event_details_model.dart';
 import 'package:mingly/src/application/events/model/event_ticket_model.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
 import 'package:mingly/src/application/events/model/menu_booking_model.dart';
+import 'package:mingly/src/application/events/model/popular_model.dart';
 import 'package:mingly/src/application/events/model/table_order_model.dart';
 import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/application/events/model/ticket_order_model.dart';
@@ -233,5 +234,15 @@ class EventsProvider extends ChangeNotifier {
   ) async {
     final response = await EventsRepo().buyTableEventTicket(data, id);
     return response;
+  }
+
+  PopularEventModel popularEventModel = PopularEventModel();
+
+  Future<void> getPopularEventList() async {
+    final response = await EventsRepo().getPopularEvent();
+    if (response.isNotEmpty) {
+      popularEventModel = PopularEventModel.fromJson(response);
+      notifyListeners();
+    }
   }
 }

@@ -67,4 +67,11 @@ class EventsRepo {
     );
     return response;
   }
+
+
+  Future<Map<String, dynamic>> getPopularEvent()async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().getData(AppUrls.getPopularEvent, authToken: preferences.getString("authToken"));
+    return reseponse;
+  }
 }

@@ -22,29 +22,28 @@ class ProfileModel {
 class Data {
   String? fullName;
   String? mobile;
-  Null? firstName;
-  Null? lastName;
-  Null? address;
-  Null? avatar;
+  String? firstName;
+  String? lastName;
+  String? address;
+  String? avatar;
   String? membershipStatus;
   int? points;
   int? currentPoints;
   int? targetPoints;
   double? progress;
 
-  Data({
-    this.fullName,
-    this.mobile,
-    this.firstName,
-    this.lastName,
-    this.address,
-    this.avatar,
-    this.membershipStatus,
-    this.points,
-    this.currentPoints,
-    this.targetPoints,
-    this.progress,
-  });
+  Data(
+      {this.fullName,
+      this.mobile,
+      this.firstName,
+      this.lastName,
+      this.address,
+      this.avatar,
+      this.membershipStatus,
+      this.points,
+      this.currentPoints,
+      this.targetPoints,
+      this.progress});
 
   Data.fromJson(Map<String, dynamic> json) {
     fullName = json['full_name'];

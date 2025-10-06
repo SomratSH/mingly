@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
 import 'package:mingly/src/constant/app_urls.dart';
@@ -13,13 +15,18 @@ class ProfileRepo {
     return ProfileModel.fromJson(reseponse);
   }
 
-  Future<ProfileModel> updateProfile(Map<String, dynamic> data) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    final reseponse = await ApiService().patchData(
+  Future<Map<String, dynamic>> updateProfile(
+    Map<String, dynamic> profileData,
+    File? image,
+  ) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await ApiService().patchData(
       AppUrls.profileUpdate,
-      data,
-      authToken: preferences.getString("authToken"),
+      profileData,
+      image: image,
+      authToken: prefs.getString('authToken'),
     );
-    return ProfileModel.fromJson(reseponse);
+    return response;
   }
 }

@@ -184,7 +184,7 @@ class ApiService {
 
         final imageBytes = await image.readAsBytes();
         var multipartFile = http.MultipartFile.fromBytes(
-          'image',
+          'avatar',
           imageBytes,
           filename: image.uri.pathSegments.last,
         );

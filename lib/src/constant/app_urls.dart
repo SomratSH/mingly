@@ -31,4 +31,14 @@ class AppUrls {
   //tables and sofa ticket list
   static String getTableTicket = "/table-availability/";
   static String tableBook = "/book-table/";
+
+  //top leader board
+  static String leaderBoard = "/top-spenders/";
+
+  //subscription
+  static String pakageget = "/membership/packages/";
+
+  static String updagradePlan = "/membership/upgrade/";
+
+  static String getPopularEvent = "/popular-events/";
 }

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +17,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
   File? _imageFile;
 
   @override
@@ -27,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ? "N/A"
           : profile.fullName.toString();
       _phoneController.text = profile.mobile ?? "N/A";
+      _addressController.text = profile.address ?? "N/A";
     });
   }
 
@@ -157,6 +161,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 validator: (value) =>
                     value!.isEmpty ? "Please enter your phone number" : null,
               ),
+              const SizedBox(height: 16),
+
+              // Phone Input
+              TextFormField(
+                controller: _addressController,
+                keyboardType: TextInputType.phone,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Address',
+                  labelStyle: const TextStyle(color: Color(0xFFFAE7E7)),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFFFAE5),
+                      width: 0.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFFFAE5),
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                validator: (value) =>
+                    value!.isEmpty ? "Please enter your phone number" : null,
+              ),
 
               const SizedBox(height: 30),
 
@@ -164,7 +196,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _saveProfile,
+                  onPressed: () async {
+                    LoadingDialog.show(context);
+                    final status = await profileProvider.updateProfile(
+                      name: _nameController.text,
+                      address: _addressController.text,
+                      phone: _phoneController.text,
+                      image: _imageFile,
+                    );
+                    LoadingDialog.hide(context);
+                    if (status["message"] == "Profile updated successfully.") {
+                      CustomSnackbar.show(context, message: status["message"]);
+                    } else {
+                      CustomSnackbar.show(
+                        context,
+                        message: "Something try again",
+                        backgroundColor: Colors.red,
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFFAE5),
                     padding: const EdgeInsets.symmetric(vertical: 14),

@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/home_screen/home_proivder.dart';
+import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
+import 'package:provider/provider.dart';
 import '../../../components/app_bars.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,6 +17,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profileProvider = context.watch<ProfileProvider>();
+    final homeProvider = context.watch<HomeProivder>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -72,12 +79,18 @@ class HomeScreen extends StatelessWidget {
                         radius: 20.r,
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
-                          child: Image.asset(
-                            'lib/assets/images/dummy_profile.jpg',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
+                          child:
+                              profileProvider.profileModel.data!.avatar != null
+                              ? Image.network(
+                                  profileProvider.profileModel.data!.avatar
+                                      .toString(),
+                                )
+                              : Image.asset(
+                                  'lib/assets/images/dummy_profile.jpg',
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
                         ),
                       ),
                     ],
@@ -100,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                         image: const DecorationImage(
                           image: AssetImage(
                             'lib/assets/images/dummy_yacht_event.png',
-                          ), 
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -200,9 +213,7 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(height: 12.h),
                   // Popular Events
                   _SectionHeader(title: 'Popular Events'),
-                  InkWell(
-                    onTap: () => context.push('/event-detail'),
-                    child: _EventCard()),
+                  _EventCard(),
                   const SizedBox(height: 24),
                   // Top 10 spenders
                   Padding(
@@ -398,113 +409,152 @@ class _VenueCard extends StatelessWidget {
 class _EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final eventProvider = context.watch<EventsProvider>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card(
-        color: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(12.r)),
-            color: Theme.of(context).colorScheme.primaryContainer,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: 140,
-                child: Image.asset(
-                  'lib/assets/images/dummy_yacht_event.png',
-                  fit: BoxFit.cover,
+      child: Column(
+        children: List.generate(
+          eventProvider.popularEventModel.topPopularEvents!.length,
+          (index) {
+            return InkWell(
+              onTap: () async {
+                LoadingDialog.show(context);
+                // eventProvider.selectEventModelFunction(event);
+                await eventProvider.getEventsDetailsData(
+                  eventProvider.popularEventModel.topPopularEvents![index].id
+                      .toString(),
+                );
+                LoadingDialog.hide(context);
+                context.push(
+                  "/event-detail",
+                  extra: eventProvider.eventsList[index],
+                );
+              },
+              child: Card(
+                color: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Super Yacht (Phuket)',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15.sp,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.r)),
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: 140,
+                        child: Image.asset(
+                          'lib/assets/images/dummy_yacht_event.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'THU 26 May, 09:00 - FRI 27 May, 10:00',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 30,
-                          child: AnimatedAvatarStack(
-                            height: 30.w,
-                            infoWidgetBuilder: (surplus, context) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(50.r),
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              eventProvider
+                                  .popularEventModel
+                                  .topPopularEvents![index]
+                                  .eventName
+                                  .toString(),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.sp,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'THU 26 May, 09:00 - FRI 27 May, 10:00',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 30,
+                                  child: AnimatedAvatarStack(
+                                    height: 30.w,
+                                    infoWidgetBuilder: (surplus, context) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(
+                                            50.r,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            surplus > 0 ? '+$surplus' : '',
+                                            style: TextStyle(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
+                                              fontSize: 12.sp,
+                                              height: 1,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    avatars: [
+                                      for (var n = 0; n < 10; n++)
+                                        NetworkImage(
+                                          'https://i.pravatar.cc/150?img=$n',
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    surplus > 0 ? '+$surplus' : '',
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimary,
-                                      fontSize: 12.sp,
-                                      height: 1,
+                                Expanded(
+                                  flex: 30,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withAlpha((255 * 0.1).toInt()),
+                                        borderRadius: BorderRadius.circular(
+                                          4.r,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Free',
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                            avatars: [
-                              for (var n = 0; n < 10; n++)
-                                NetworkImage(
-                                  'https://i.pravatar.cc/150?img=$n',
-                                ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 30,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary
-                                    .withAlpha((255 * 0.1).toInt()),
-                                borderRadius: BorderRadius.circular(4.r),
-                              ),
-                              child: Text(
-                                'Free',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -514,6 +564,7 @@ class _EventCard extends StatelessWidget {
 class _Leaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final homeProivder = context.watch<HomeProivder>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -547,7 +598,7 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Tuhin Ghoria',
+                        homeProivder.leaderBoardList[1].fullName.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -556,7 +607,7 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '45,000,000',
+                        homeProivder.leaderBoardList[1].points.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -592,16 +643,20 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Mrs. Diana',
+                        homeProivder.leaderBoardList[0].fullName.toString(),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15.sp,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(182),
+                          fontSize: 13.sp,
                         ),
                       ),
                       Text(
-                        '45,000,000',
+                        homeProivder.leaderBoardList[0].points.toString(),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(136),
                           fontSize: 11.sp,
                         ),
                       ),
@@ -633,7 +688,7 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Calcutta',
+                        homeProivder.leaderBoardList[2].fullName.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -642,7 +697,7 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '45,000,000',
+                        homeProivder.leaderBoardList[2].points.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -664,58 +719,63 @@ class _Leaderboard extends StatelessWidget {
           ),
           SizedBox(height: 10.w),
           // List of spenders
-          ...List.generate(7, (index) {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 4.h),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 22.w,
-                    child: Text(
-                      '${index + 4}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 13.sp,
-                      ),
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  CircleAvatar(
-                    radius: 28.h,
-                    backgroundColor: Colors.grey.shade800,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        'https://i.pravatar.cc/150?img=${index + 10}',
+          ...List.generate(homeProivder.leaderBoardList.length, (index) {
+            if (index != 0 && index != 1 && index != 2) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 4.h),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 22.w,
+                      child: Text(
+                        '${index + 1}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 13.sp,
+                        ),
+                        textAlign: TextAlign.end,
                       ),
                     ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          'Name ${index + 4}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                    SizedBox(width: 16.w),
+                    CircleAvatar(
+                      radius: 28.h,
+                      backgroundColor: Colors.grey.shade800,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Image.network(
+                          'https://i.pravatar.cc/150?img=${index + 10}',
                         ),
-                        Text(
-                          '${(24 - index * 2).toStringAsFixed(0)},000,000',
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withAlpha(128),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            homeProivder.leaderBoardList[index].fullName
+                                .toString(),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          Text(
+                            '${homeProivder.leaderBoardList[index].points}',
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withAlpha(128),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return SizedBox();
+            }
           }),
         ],
       ),

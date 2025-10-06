@@ -43,7 +43,14 @@ class ProfileScreen extends StatelessWidget {
                       child: ListTile(
                         leading: CircleAvatar(
                           radius: 28,
-                          child: Image.asset("lib/assets/images/pp.png"),
+                          backgroundImage:
+                              profileProvider.profileModel.data!.avatar == null
+                              ? const AssetImage("lib/assets/images/pp.png")
+                              : NetworkImage(
+                                      profileProvider.profileModel.data!.avatar
+                                          .toString(),
+                                    )
+                                    as ImageProvider,
                         ),
                         title: Text(
                           profileProvider.profileModel.data!.fullName ?? "N/A",

@@ -14,7 +14,7 @@ import 'package:mingly/src/application/events/repo/events_repo.dart';
 class EventsProvider extends ChangeNotifier {
   List<EventsModel> eventsList = [];
 
-  Future<void> getVenuesList() async {
+  Future<void> getEventList() async {
     final response = await EventsRepo().getEvents();
 
     if (response.isNotEmpty) {

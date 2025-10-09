@@ -17,34 +17,37 @@ class VenuesModel {
   String? contactPhone;
   String? websiteUrl;
   String? status;
+  String? image;
   String? createdAt;
   String? updatedAt;
   int? createdBy;
   List<OpeningHours>? openingHours;
 
-  VenuesModel(
-      {this.id,
-      this.name,
-      this.description,
-      this.address,
-      this.city,
-      this.state,
-      this.country,
-      this.postalCode,
-      this.latitude,
-      this.longitude,
-      this.capacity,
-      this.seatingLayout,
-      this.facilities,
-      this.contactPerson,
-      this.contactEmail,
-      this.contactPhone,
-      this.websiteUrl,
-      this.status,
-      this.createdAt,
-      this.updatedAt,
-      this.createdBy,
-      this.openingHours});
+  VenuesModel({
+    this.id,
+    this.name,
+    this.description,
+    this.address,
+    this.city,
+    this.state,
+    this.country,
+    this.postalCode,
+    this.image,
+    this.latitude,
+    this.longitude,
+    this.capacity,
+    this.seatingLayout,
+    this.facilities,
+    this.contactPerson,
+    this.contactEmail,
+    this.contactPhone,
+    this.websiteUrl,
+    this.status,
+    this.createdAt,
+    this.updatedAt,
+    this.createdBy,
+    this.openingHours,
+  });
 
   VenuesModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -58,6 +61,7 @@ class VenuesModel {
     latitude = json['latitude'];
     longitude = json['longitude'];
     capacity = json['capacity'];
+    image = json['picture'];
     seatingLayout = json['seating_layout'];
     facilities = json['facilities'];
     contactPerson = json['contact_person'];
@@ -100,8 +104,9 @@ class VenuesModel {
     data['updated_at'] = this.updatedAt;
     data['created_by'] = this.createdBy;
     if (this.openingHours != null) {
-      data['opening_hours'] =
-          this.openingHours!.map((v) => v.toJson()).toList();
+      data['opening_hours'] = this.openingHours!
+          .map((v) => v.toJson())
+          .toList();
     }
     return data;
   }

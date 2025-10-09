@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/home_screen/home_proivder.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
@@ -82,8 +83,14 @@ class HomeScreen extends StatelessWidget {
                           child:
                               profileProvider.profileModel.data!.avatar != null
                               ? Image.network(
-                                  profileProvider.profileModel.data!.avatar
-                                      .toString(),
+                                  AppUrls.imageUrl +
+                                      profileProvider.profileModel.data!.avatar
+                                          .toString(),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.network(
+                                        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                        fit: BoxFit.cover,
+                                      ),
                                 )
                               : Image.asset(
                                   'lib/assets/images/dummy_profile.jpg',
@@ -446,8 +453,13 @@ class _EventCard extends StatelessWidget {
                     children: [
                       SizedBox(
                         height: 140,
-                        child: Image.asset(
-                          'lib/assets/images/dummy_yacht_event.png',
+                        child: Image.network(
+                          AppUrls.imageUrl +
+                              eventProvider
+                                  .popularEventModel
+                                  .topPopularEvents![index]
+                                  .picture
+                                  .toString(),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -593,7 +605,14 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            'https://i.pravatar.cc/150?img=12',
+                            AppUrls.imageUrl +
+                                homeProivder.leaderBoardList[1].image
+                                    .toString(),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Image.network(
+                                  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                  fit: BoxFit.cover,
+                                ),
                           ),
                         ),
                       ),
@@ -638,7 +657,14 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            'https://i.pravatar.cc/150?img=5',
+                            AppUrls.imageUrl +
+                                homeProivder.leaderBoardList[0].image
+                                    .toString(),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Image.network(
+                                  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                  fit: BoxFit.cover,
+                                ),
                           ),
                         ),
                       ),
@@ -683,7 +709,14 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            'https://i.pravatar.cc/150?img=9',
+                            AppUrls.imageUrl +
+                                homeProivder.leaderBoardList[2].image
+                                    .toString(),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Image.network(
+                                  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                  fit: BoxFit.cover,
+                                ),
                           ),
                         ),
                       ),
@@ -743,7 +776,15 @@ class _Leaderboard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: Image.network(
-                          'https://i.pravatar.cc/150?img=${index + 10}',
+                          AppUrls.imageUrl +
+                              homeProivder.leaderBoardList[index].image
+                                  .toString(),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.network(
+                                'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                fit: BoxFit.cover,
+                              ),
                         ),
                       ),
                     ),

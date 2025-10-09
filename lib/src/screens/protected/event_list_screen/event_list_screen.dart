@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -103,7 +104,7 @@ class EventListScreen extends StatelessWidget {
                     );
                   },
                   date: event.createdAt ?? "",
-                  image: 'lib/assets/images/dummy_yacht_event.png',
+                  image: event.image.toString(),
                   title: event.eventName ?? "",
                   location: event.venueName ?? "",
                   country: event.currency ?? "",
@@ -163,13 +164,39 @@ class _EventCard extends StatelessWidget {
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
-                      child: Image.asset(
-                        image,
+                      child: Image.network(
+                        AppUrls.imageUrl + image,
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
+
+                        errorBuilder: (context, error, stackTrace) {
+                          debugPrint("❌ Image load failed: $error");
+                          return Image.network(
+                            'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                            fit: BoxFit.cover,
+                            height: 160,
+                            width: double.infinity,
+                          );
+                        },
+
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 160,
+                            width: double.infinity,
+                            color: Colors.grey.shade300.withOpacity(0.4),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
+
                     Padding(
                       padding: EdgeInsets.all(4.w),
                       child: Column(

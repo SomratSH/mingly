@@ -1,5 +1,6 @@
 class AppUrls {
-  static String baseUrl = "http://10.10.13.20:8005/app/api/v1";
+  static String baseUrl = "http://10.10.13.20:9000/app/api/v1";
+  static String imageUrl = "http://10.10.13.20:9000";
   // static String baseUrl = "https://080aadaa0adf.ngrok-free.app/app/api/v1";
 
   //authentication

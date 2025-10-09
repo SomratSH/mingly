@@ -11,7 +11,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsRepo {
   Future<List<EventsModel>> getEvents() async {
-    final response = await ApiService().getList(AppUrls.eventsUrl);
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final response = await ApiService().getList(
+      AppUrls.eventsUrl,
+      authToken: preferences.getString("authToken"),
+    );
     return response.map((e) => EventsModel.fromJson(e)).toList();
   }
 
@@ -68,10 +72,12 @@ class EventsRepo {
     return response;
   }
 
-
-  Future<Map<String, dynamic>> getPopularEvent()async{
+  Future<Map<String, dynamic>> getPopularEvent() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    final reseponse = await ApiService().getData(AppUrls.getPopularEvent, authToken: preferences.getString("authToken"));
+    final reseponse = await ApiService().getData(
+      AppUrls.getPopularEvent,
+      authToken: preferences.getString("authToken"),
+    );
     return reseponse;
   }
 }

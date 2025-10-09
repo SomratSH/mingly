@@ -4,21 +4,24 @@ class EventsModel {
   String? about;
   String? description;
   String? currency;
+  String? image;
   String? createdAt;
   String? updatedAt;
   String? venueName;
   String? venueCity;
 
-  EventsModel(
-      {this.id,
-      this.eventName,
-      this.about,
-      this.description,
-      this.currency,
-      this.createdAt,
-      this.updatedAt,
-      this.venueName,
-      this.venueCity});
+  EventsModel({
+    this.id,
+    this.eventName,
+    this.about,
+    this.description,
+    this.currency,
+    this.createdAt,
+    this.image,
+    this.updatedAt,
+    this.venueName,
+    this.venueCity,
+  });
 
   EventsModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -30,6 +33,7 @@ class EventsModel {
     updatedAt = json['updated_at'];
     venueName = json['venue_name'];
     venueCity = json['venue_city'];
+    image = json['picture'];
   }
 
   Map<String, dynamic> toJson() {

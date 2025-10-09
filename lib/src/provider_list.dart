@@ -13,7 +13,7 @@ class ProviderList {
     ChangeNotifierProvider(create: (_) => VenueProvider()..getVenuesList()),
     ChangeNotifierProvider(
       create: (_) => EventsProvider()
-        ..getVenuesList()
+        ..getEventList()
         ..getPopularEventList(),
     ),
     ChangeNotifierProvider(create: (_) => BottleProvider()..getBottleList()),

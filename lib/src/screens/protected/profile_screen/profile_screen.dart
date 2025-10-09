@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_dialog.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -47,8 +48,12 @@ class ProfileScreen extends StatelessWidget {
                               profileProvider.profileModel.data!.avatar == null
                               ? const AssetImage("lib/assets/images/pp.png")
                               : NetworkImage(
-                                      profileProvider.profileModel.data!.avatar
-                                          .toString(),
+                                      AppUrls.imageUrl +
+                                          profileProvider
+                                              .profileModel
+                                              .data!
+                                              .avatar
+                                              .toString(),
                                     )
                                     as ImageProvider,
                         ),
@@ -188,38 +193,31 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          'Membership details >>',
-                          style: TextStyle(color: theme.colorScheme.primary),
-                        ),
-                      ),
+                      // Align(
+                      //   alignment: Alignment.centerRight,
+                      //   child: Text(
+                      //     'Membership details >>',
+                      //     style: TextStyle(color: theme.colorScheme.primary),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               // Menu List
-              _ProfileMenuItem(icon: Icons.leaderboard, title: 'Leaderboard'),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Container(height: 1, color: Colors.white),
-              ),
               _ProfileMenuItem(
-                icon: Icons.language,
-                title: 'Language',
-                trailing: 'English',
+                icon: Icons.leaderboard,
+                title: 'Leaderboard',
+                onTap: () {
+                  context.push("/leaderboard");
+                },
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
-              _ProfileMenuItem(icon: Icons.settings, title: 'Account Settings'),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Container(height: 1, color: Colors.white),
-              ),
+
               _ProfileMenuItem(icon: Icons.payment, title: 'Payment Method'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -250,24 +248,24 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               // Update Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: theme.colorScheme.primary,
+              //       foregroundColor: Colors.white,
+              //       padding: const EdgeInsets.symmetric(vertical: 18),
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(16),
+              //       ),
+              //     ),
+              //     onPressed: () {},
+              //     child: const Text(
+              //       'Update',
+              //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 50),
             ],
           ),

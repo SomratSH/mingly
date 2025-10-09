@@ -29,6 +29,7 @@ import 'package:mingly/src/screens/protected/payment/payment_screen.dart';
 import 'package:mingly/src/screens/protected/payment/payment_table.dart';
 import 'package:mingly/src/screens/protected/personal_info_screen/personal_info_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/edit_profile.dart';
+import 'package:mingly/src/screens/protected/profile_screen/leader_board.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_screen.dart';
 import 'package:mingly/src/screens/protected/select_country_screen/select_country_screen.dart';
 import 'package:mingly/src/screens/protected/select_payment_screen/select_payment_screen.dart';
@@ -166,6 +167,10 @@ class AppRouter {
         GoRoute(
           path: '/edit-profile',
           builder: (context, state) => EditProfileScreen(),
+        ),
+        GoRoute(
+          path: '/leaderboard',
+          builder: (context, state) => LeaderBoard(),
         ),
 
         // Shell routing for protected pages

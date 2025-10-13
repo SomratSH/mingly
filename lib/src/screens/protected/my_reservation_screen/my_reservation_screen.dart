@@ -1,13 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/constant/app_urls.dart';
+import 'package:mingly/src/screens/protected/my_reservation_screen/reservation_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyReservationScreen extends StatelessWidget {
   const MyReservationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => ReservationProvider()..getFavouriteList(),
+      child: _Layout(),
+    );
+  }
+}
 
+class _Layout extends StatelessWidget {
+  const _Layout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final provider = context.watch<ReservationProvider>();
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -28,34 +45,56 @@ class MyReservationScreen extends StatelessWidget {
             ),
 
             // ✅ Fix: Wrap ListView with Expanded
-            Expanded(
-              child: ListView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                children:  [
-                  InkWell(
-                    onTap: () => context.push('/event-detail'),
-                    child: _ReservationCard(
-                      title: "Waves & Raves '' - Celvaie",
-                      location: "Singapore",
-                      imagePath: 'lib/assets/images/dummy_yacht.png',
-                      date: "Aug 25, 2025",
-                      status: "Confirmed",
+            provider.isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
+                      ),
+                      children: List.generate(
+                        provider.reservationList.length,
+                        (index) => InkWell(
+                          onTap: () => context.push('/event-detail'),
+                          child: _ReservationCard(
+                            onPressed: () async {
+                              LoadingDialog.show(context);
+                              final response = await provider.addToFavourite(
+                                provider.reservationList[index].event
+                                    .toString(),
+                              );
+                              if (response["message"] != null) {
+                                CustomSnackbar.show(
+                                  context,
+                                  message: response["message"],
+                                  backgroundColor: Colors.green,
+                                );
+                              } else {
+                                CustomSnackbar.show(
+                                  context,
+                                  message: "Something wrong, try again",
+                                  backgroundColor: Colors.green,
+                                );
+                              }
+                              LoadingDialog.hide(context);
+                            },
+                            title: provider.reservationList[index].eventName
+                                .toString(),
+                            location: provider.reservationList[index].city
+                                .toString(),
+                            imagePath: provider
+                                .reservationList[index]
+                                .eventPicture
+                                .toString(),
+                            date: "Aug 25, 2025",
+                            status: provider.reservationList[index].status
+                                .toString(),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () => context.push('/event-detail'),
-                    child: _ReservationCard(
-                      title: "Sunset Beats",
-                      location: "Bali",
-                      imagePath: 'lib/assets/images/dummy_yacht.png',
-                      date: "Sep 10, 2025",
-                      status: "Pending",
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -69,6 +108,7 @@ class _ReservationCard extends StatelessWidget {
   final String imagePath;
   final String date;
   final String status;
+  final Function() onPressed;
 
   const _ReservationCard({
     required this.title,
@@ -76,6 +116,7 @@ class _ReservationCard extends StatelessWidget {
     required this.imagePath,
     required this.date,
     required this.status,
+    required this.onPressed,
   });
 
   @override
@@ -94,8 +135,8 @@ class _ReservationCard extends StatelessWidget {
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
               ),
-              child: Image.asset(
-                imagePath,
+              child: Image.network(
+                "${AppUrls.imageUrl}${imagePath}",
                 width: 90,
                 height: 90,
                 fit: BoxFit.cover,
@@ -103,8 +144,10 @@ class _ReservationCard extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -125,8 +168,11 @@ class _ReservationCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.calendar_today,
-                            size: 14, color: theme.colorScheme.primary),
+                        Icon(
+                          Icons.calendar_today,
+                          size: 14,
+                          color: theme.colorScheme.primary,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           date,
@@ -153,7 +199,7 @@ class _ReservationCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.favorite_border),
               color: theme.colorScheme.primary,
-              onPressed: () {},
+              onPressed: onPressed,
             ),
           ],
         ),

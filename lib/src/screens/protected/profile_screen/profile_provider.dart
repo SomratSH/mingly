@@ -1,11 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mingly/src/application/point_history/model/point_history_model.dart';
+import 'package:mingly/src/application/point_history/repo/point_history_repo.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
+import 'package:mingly/src/application/profile/model/voucher_model.dart';
 import 'package:mingly/src/application/profile/repo/profile_repo.dart';
 
 class ProfileProvider extends ChangeNotifier {
   ProfileModel profileModel = ProfileModel();
+
+  List<VoucherModel> voucherList = [];
+  PointHistory pointHistory = PointHistory();
+  bool isLoading = false;
 
   Future<void> getProfile() async {
     final reseponse = await ProfileRepo().fetchProfile();
@@ -34,5 +41,30 @@ class ProfileProvider extends ChangeNotifier {
       debugPrint("Failed to update profile");
     }
     return response;
+  }
+
+  Future<void> getVoucherList() async {
+    isLoading = true;
+    notifyListeners();
+    final response = await ProfileRepo().getVoucer();
+    if (response.isNotEmpty) {
+      List<dynamic> data = response;
+
+      for (var e in data) {
+        voucherList.add(e);
+      }
+      isLoading = false;
+      notifyListeners();
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> getPointHistory() async {
+    final response = await PointHistoryRepo().getPointHistory();
+    if (response != null) {
+      pointHistory = PointHistory.fromJson(response);
+      notifyListeners();
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_dialog.dart';
 import 'package:mingly/src/constant/app_urls.dart';
+import 'package:mingly/src/screens/protected/my_reservation_screen/my_reservation_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -226,17 +227,29 @@ class ProfileScreen extends StatelessWidget {
               _ProfileMenuItem(
                 icon: Icons.book_online,
                 title: 'My Reservation',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => MyReservationScreen()),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
-              _ProfileMenuItem(icon: Icons.history, title: 'Point History'),
+              _ProfileMenuItem(
+                icon: Icons.history,
+                title: 'Point History',
+                onTap: () => context.push("/point-history"),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),
               ),
-              _ProfileMenuItem(icon: Icons.card_giftcard, title: 'My Voucher'),
+              _ProfileMenuItem(
+                icon: Icons.card_giftcard,
+                title: 'My Voucher',
+                onTap: () => context.push("/voucher-list"),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Container(height: 1, color: Colors.white),

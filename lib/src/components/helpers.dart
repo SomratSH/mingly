@@ -140,3 +140,21 @@ String formatDate(String isoString) {
     return isoString; // fallback if invalid
   }
 }
+
+
+String formatDateTime(String utcString) {
+  try {
+    // Parse UTC string and convert to local time
+    DateTime dateTime = DateTime.parse(utcString).toLocal();
+
+    // Format date and time
+    String datePart = DateFormat("dd").format(dateTime);
+    String monthPart = DateFormat("MMM").format(dateTime).toUpperCase();
+    String timePart = DateFormat("ha").format(dateTime).toUpperCase();
+
+    return "$datePart $monthPart, $timePart";
+  } catch (e) {
+    // Return original string if parsing fails
+    return utcString;
+  }
+}

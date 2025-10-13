@@ -17,9 +17,15 @@ class ProviderList {
         ..getPopularEventList(),
     ),
     ChangeNotifierProvider(create: (_) => BottleProvider()..getBottleList()),
-    ChangeNotifierProvider(create: (_) => ProfileProvider()..getProfile()),
+    ChangeNotifierProvider(
+      create: (_) => ProfileProvider()
+        ..getProfile()
+        ..getPointHistory()
+        ..getVoucherList(),
+    ),
     ChangeNotifierProvider(
       create: (_) => HomeProivder()
+        ..getCurrentLocationName()
         ..getLeaderBoardlist()
         ..getPackagelist(),
     ),

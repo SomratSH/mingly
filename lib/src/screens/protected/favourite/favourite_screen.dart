@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/constant/app_urls.dart';
+import 'package:mingly/src/screens/protected/favourite/favourite_provider.dart';
+import 'package:provider/provider.dart';
 
 class FavouriteScreen extends StatelessWidget {
   const FavouriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Example data (replace with API or local data later)
-    final favourites = [
-      {
-        "title": "[Waves & Raves] - \nCelvaie",
-        "location": "Singapore",
-        "image": "lib/assets/images/demo_fav.jpg",
-        "icon": "lib/assets/icons/mdi_heart.svg",
-      },
-      {
-        "title": "Summer Beats - \nClub XYZ",
-        "location": "Dubai",
-        "image": "lib/assets/images/demo_fav.jpg",
-        "icon": "lib/assets/icons/mdi_heart.svg",
-      },
-    ];
+    return ChangeNotifierProvider(
+      create: (_) => FavouriteProvider()..getFavouriteList(),
+      child: _Layout(),
+    );
+  }
+}
+
+class _Layout extends StatelessWidget {
+  const _Layout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<FavouriteProvider>();
 
     return Scaffold(
       body: SafeArea(
@@ -44,21 +45,21 @@ class FavouriteScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             // List of favorites
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(8.0),
-                itemCount: favourites.length,
+                itemCount: provider.favouriteList.length,
                 itemBuilder: (context, index) {
-                  final fav = favourites[index];
+                  final fav = provider.favouriteList[index];
                   return InkWell(
                     onTap: () => context.push('/venue-detail'),
                     child: FavouriteCard(
-                      title: fav["title"]!,
-                      location: fav["location"]!,
-                      imagePath: fav["image"]!,
-                      iconPath: fav["icon"]!,
+                      title: fav.eventName.toString(),
+                      location:
+                          "${fav.address.toString()}, ${fav.city.toString()}, ${fav.state.toString()}, ${fav.country.toString()}",
+                      imagePath: fav.eventPicture.toString(),
+                      iconPath: "lib/assets/icons/mdi_heart.svg",
                     ),
                   );
                 },
@@ -102,8 +103,8 @@ class FavouriteCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  imagePath,
+                child: Image.network(
+                  "${AppUrls.imageUrl}${imagePath}",
                   fit: BoxFit.cover,
                   height: 100,
                   width: 100,

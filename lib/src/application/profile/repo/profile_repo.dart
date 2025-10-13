@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
+import 'package:mingly/src/application/profile/model/voucher_model.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,5 +29,18 @@ class ProfileRepo {
       authToken: prefs.getString('authToken'),
     );
     return response;
+  }
+
+  Future<List<VoucherModel>> getVoucer() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().getList(
+      AppUrls.getVoucher,
+      authToken: preferences.getString("authToken"),
+    );
+    if (reseponse.isNotEmpty) {
+      return reseponse.map((e) => VoucherModel.fromJson(e)).toList();
+    } else {
+      return [];
+    }
   }
 }

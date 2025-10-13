@@ -22,6 +22,20 @@ class HomeScreen extends StatelessWidget {
     final homeProvider = context.watch<HomeProivder>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50),
+        child: FloatingActionButton(
+          backgroundColor: Color(0xFFD1B26F),
+          onPressed: () {
+            context.push("/ai-chat");
+          },
+          child: Image.asset(
+            "lib/assets/images/bot.png",
+            height: 30,
+            width: 30,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -66,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                'Bangkok,Thailand',
+                                homeProvider.addressUser,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white,
                                 ),

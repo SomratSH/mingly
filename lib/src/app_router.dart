@@ -18,6 +18,7 @@ import 'package:mingly/src/screens/protected/event_detail_screen/event_details_s
 import 'package:mingly/src/screens/protected/event_list_screen/event_list_screen.dart';
 import 'package:mingly/src/screens/protected/favourite/favourite_screen.dart';
 import 'package:mingly/src/screens/protected/food_menu_screen/food_menu_screen.dart';
+import 'package:mingly/src/screens/protected/home_screen/ai_chat.dart';
 import 'package:mingly/src/screens/protected/home_screen/home_screen.dart';
 import 'package:mingly/src/screens/protected/landing_page.dart/landing_page.dart';
 import 'package:mingly/src/screens/protected/membership_screen/membership_screen.dart';
@@ -30,7 +31,9 @@ import 'package:mingly/src/screens/protected/payment/payment_table.dart';
 import 'package:mingly/src/screens/protected/personal_info_screen/personal_info_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/edit_profile.dart';
 import 'package:mingly/src/screens/protected/profile_screen/leader_board.dart';
+import 'package:mingly/src/screens/protected/profile_screen/point_history.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_screen.dart';
+import 'package:mingly/src/screens/protected/profile_screen/voucher_list.dart';
 import 'package:mingly/src/screens/protected/select_country_screen/select_country_screen.dart';
 import 'package:mingly/src/screens/protected/select_payment_screen/select_payment_screen.dart';
 import 'package:mingly/src/screens/protected/table_booking_screen/table_booking_screen.dart';
@@ -172,7 +175,15 @@ class AppRouter {
           path: '/leaderboard',
           builder: (context, state) => LeaderBoard(),
         ),
-
+        GoRoute(
+          path: '/voucher-list',
+          builder: (context, state) => VoucherListScreen(),
+        ),
+        GoRoute(path: '/ai-chat', builder: (context, state) => AiChatScreen()),
+        GoRoute(
+          path: '/point-history',
+          builder: (context, state) => PointsHistoryScreen(),
+        ),
         // Shell routing for protected pages
         ShellRoute(
           builder: (context, state, child) => LandingPage(child: child),

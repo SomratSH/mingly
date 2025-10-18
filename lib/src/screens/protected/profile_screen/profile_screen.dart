@@ -208,6 +208,17 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 16),
               // Menu List
               _ProfileMenuItem(
+                icon: Icons.shopping_bag,
+                title: 'Orders History',
+                onTap: () {
+                  context.push("/order-history");
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(height: 1, color: Colors.white),
+              ),
+              _ProfileMenuItem(
                 icon: Icons.leaderboard,
                 title: 'Leaderboard',
                 onTap: () {

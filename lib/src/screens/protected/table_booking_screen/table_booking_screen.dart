@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_snackbar.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -195,14 +196,13 @@ class TableBookingScreen extends StatelessWidget {
                 spacing: 15,
                 runSpacing: 8,
                 children: [
-                  _TimeSlotButton(label: '11:15'),
-                  _TimeSlotButton(label: '11:30'),
-                  _TimeSlotButton(label: '11:45'),
-                  _TimeSlotButton(label: '12:00', selected: true),
-                  _TimeSlotButton(label: '12:15'),
-                  _TimeSlotButton(label: '12:30'),
-                  _TimeSlotButton(label: '12:45', selected: true),
-                  _TimeSlotButton(label: '13:00'),
+                  ...List.generate(eventProvider.listedTimeSlot!.length, (
+                    index,
+                  ) {
+                    final timeSlot = eventProvider.listedTimeSlot![index];
+
+                    return _TimeSlotButton(label: timeSlot, index: index);
+                  }),
                 ],
               ),
               const SizedBox(height: 24),
@@ -212,8 +212,8 @@ class TableBookingScreen extends StatelessWidget {
                     border: Border.all(color: Colors.white24),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Image.asset(
-                    'lib/assets/images/table_book.jpg',
+                  child: Image.network(
+                    '${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsModel.images!.first.seatingPlan}',
                     height: 200,
                     fit: BoxFit.contain,
                   ),
@@ -292,20 +292,30 @@ class TableBookingScreen extends StatelessWidget {
 class _TimeSlotButton extends StatelessWidget {
   final String label;
   final bool selected;
-  const _TimeSlotButton({required this.label, this.selected = false});
+  final int index;
+  const _TimeSlotButton({
+    required this.label,
+    this.selected = false,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<EventsProvider>();
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: selected
+        backgroundColor: provider.indexOfSelectedTimeSlot == index
             ? const Color(0xFFD1B26F)
             : Colors.grey.shade900,
-        foregroundColor: selected ? Colors.black : Colors.white,
+        foregroundColor: provider.indexOfSelectedTimeSlot == index
+            ? Colors.black
+            : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
-      onPressed: () {},
+      onPressed: () {
+        provider.selectTimeSlot(index);
+      },
       child: Text(label),
     );
   }

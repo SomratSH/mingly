@@ -13,9 +13,38 @@ import 'package:mingly/src/application/events/repo/events_repo.dart';
 
 class EventsProvider extends ChangeNotifier {
   List<EventsModel> eventsList = [];
+  int currentIndex = 0;
+  List<String> eventDetailsImageList = [];
+
+  previousImage() {
+    if (currentIndex > 0) {
+      currentIndex--;
+    }
+    notifyListeners();
+  }
+
+  nextImage() {
+    if (currentIndex < eventDetailsModel.images!.length - 1) {
+      currentIndex++;
+    }
+    notifyListeners();
+  }
 
   Future<void> getEventList() async {
     final response = await EventsRepo().getEvents();
+
+    if (response.isNotEmpty) {
+      List<EventsModel> data = response;
+      eventsList.clear();
+      for (var e in data) {
+        eventsList.add(e);
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> getEventListSearch(String date, String search) async {
+    final response = await EventsRepo().getEventsSearch(search, date);
 
     if (response.isNotEmpty) {
       List<EventsModel> data = response;
@@ -35,6 +64,13 @@ class EventsProvider extends ChangeNotifier {
     final response = await EventsRepo().getEventsDetails(id);
     if (response != null) {
       eventDetailsModel = response;
+      eventDetailsImageList.clear();
+      eventDetailsImageList = List<String>.from(
+        jsonDecode(eventDetailsModel.images!.first.imageGl.toString()),
+      );
+      eventDetailsImageList.forEach((e) {
+        print(e);
+      });
     }
     notifyListeners();
   }
@@ -244,5 +280,40 @@ class EventsProvider extends ChangeNotifier {
       popularEventModel = PopularEventModel.fromJson(response);
       notifyListeners();
     }
+  }
+
+  List<String> listedTimeSlot = [
+    '10:00',
+    '10:15',
+    '10:30',
+    '10:45',
+    '11:00',
+    '11:15',
+    '11:30',
+    '11:45',
+    '12:00',
+    '12:15',
+    '12:30',
+    '12:45',
+    '13:00',
+  ];
+  int indexOfSelectedTimeSlot = -1;
+  void selectTimeSlot(int index) {
+    indexOfSelectedTimeSlot = index;
+    notifyListeners();
+  }
+
+  List<EventsModel> eventsListVenueWise = [];
+  Future<void> getEvetListVuneWise(int id) async {
+    final response = await EventsRepo().getEventsVenuseWise(id);
+
+    if (response.isNotEmpty) {
+      List<EventsModel> data = response;
+      eventsListVenueWise.clear();
+      for (var e in data) {
+        eventsList.add(e);
+      }
+    }
+    notifyListeners();
   }
 }

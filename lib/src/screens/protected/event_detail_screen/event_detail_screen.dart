@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/components/helpers.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -50,31 +51,56 @@ class EventDetailScreen extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(
-                        'lib/assets/images/dummy_yacht_event.png',
-                        height: 180,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
+                      child: PageView.builder(
+                        itemCount: eventProvider.eventDetailsImageList.length,
+                        onPageChanged: (index) {},
+
+                        itemBuilder: (context, index) {
+                          return Image.network(
+                            "${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsImageList[index]}",
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          );
+                        },
                       ),
                     ),
+                    // 🔹 Back arrow
                     Positioned(
                       left: 8,
                       top: 80,
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white70,
-                        size: 24,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () {
+                          eventProvider.previousImage();
+                        },
                       ),
                     ),
+                    // 🔹 Forward arrow
                     Positioned(
                       right: 8,
                       top: 80,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white70,
-                        size: 24,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white70,
+                        ),
+                        onPressed: () {
+                          eventProvider.nextImage();
+                        },
                       ),
                     ),
+                    // 🔹 Dots indicator
                     Positioned(
                       bottom: 8,
                       left: 0,
@@ -82,13 +108,15 @@ class EventDetailScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          5,
+                          eventProvider.eventDetailsModel.images!.length,
                           (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: index == 0 ? Colors.white : Colors.white24,
+                              color: eventProvider.currentIndex == index
+                                  ? Colors.white
+                                  : Colors.white30,
                               shape: BoxShape.circle,
                             ),
                           ),

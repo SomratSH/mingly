@@ -48,52 +48,57 @@ class _Layout extends StatelessWidget {
             provider.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      children: List.generate(
-                        provider.reservationList.length,
-                        (index) => InkWell(
-                          onTap: () => context.push('/event-detail'),
-                          child: _ReservationCard(
-                            onPressed: () async {
-                              LoadingDialog.show(context);
-                              final response = await provider.addToFavourite(
-                                provider.reservationList[index].event
-                                    .toString(),
-                              );
-                              if (response["message"] != null) {
-                                CustomSnackbar.show(
-                                  context,
-                                  message: response["message"],
-                                  backgroundColor: Colors.green,
-                                );
-                              } else {
-                                CustomSnackbar.show(
-                                  context,
-                                  message: "Something wrong, try again",
-                                  backgroundColor: Colors.green,
-                                );
-                              }
-                              LoadingDialog.hide(context);
-                            },
-                            title: provider.reservationList[index].eventName
-                                .toString(),
-                            location: provider.reservationList[index].city
-                                .toString(),
-                            imagePath: provider
-                                .reservationList[index]
-                                .eventPicture
-                                .toString(),
-                            date: "Aug 25, 2025",
-                            status: provider.reservationList[index].status
-                                .toString(),
+                    child: provider.reservationList.isEmpty
+                        ? Center(child: Text("No reservation"))
+                        : ListView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 16,
+                            ),
+                            children: List.generate(
+                              provider.reservationList.length,
+                              (index) => InkWell(
+                                onTap: () => context.push('/event-detail'),
+                                child: _ReservationCard(
+                                  onPressed: () async {
+                                    LoadingDialog.show(context);
+                                    final response = await provider
+                                        .addToFavourite(
+                                          provider.reservationList[index].event
+                                              .toString(),
+                                        );
+                                    if (response["message"] != null) {
+                                      CustomSnackbar.show(
+                                        context,
+                                        message: response["message"],
+                                        backgroundColor: Colors.green,
+                                      );
+                                    } else {
+                                      CustomSnackbar.show(
+                                        context,
+                                        message: "Something wrong, try again",
+                                        backgroundColor: Colors.green,
+                                      );
+                                    }
+                                    LoadingDialog.hide(context);
+                                  },
+                                  title: provider
+                                      .reservationList[index]
+                                      .eventName
+                                      .toString(),
+                                  location: provider.reservationList[index].city
+                                      .toString(),
+                                  imagePath: provider
+                                      .reservationList[index]
+                                      .eventPicture
+                                      .toString(),
+                                  date: "Aug 25, 2025",
+                                  status: provider.reservationList[index].status
+                                      .toString(),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
           ],
         ),

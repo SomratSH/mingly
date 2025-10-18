@@ -25,6 +25,8 @@ class ReservationProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+    isLoading = false;
+    notifyListeners();
   }
 
   Future<Map<String, dynamic>> addToFavourite(String id) async {
@@ -39,22 +41,25 @@ class ReservationProvider extends ChangeNotifier {
           "Content-Type": "application/json",
           "Authorization": "Bearer ${preferences.getString("authToken")}",
         },
-        body: jsonEncode({}), // ✅ optional: if your API expects an empty body
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        debugPrint("✅ Added to favourites: $data");
+        debugPrint("Added to favourites: $data");
         return data;
+      } else if (response.statusCode == 400 || response.statusCode == 401) {
+        final data = jsonDecode(response.body);
+        return data;
+        debugPrint("Added to favourites: $data");
       } else {
-        debugPrint("⚠️ Failed (${response.statusCode}): ${response.body}");
+        debugPrint(" Failed (${response.statusCode}): ${response.body}");
         return {
           "status": "error",
           "message": "Request failed with ${response.statusCode}",
         };
       }
     } catch (e) {
-      debugPrint("❌ Error: $e");
+      debugPrint("Error: $e");
       return {"status": "error", "message": e.toString()};
     }
   }

@@ -31,6 +31,8 @@ import 'package:mingly/src/screens/protected/payment/payment_table.dart';
 import 'package:mingly/src/screens/protected/personal_info_screen/personal_info_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/edit_profile.dart';
 import 'package:mingly/src/screens/protected/profile_screen/leader_board.dart';
+import 'package:mingly/src/screens/protected/profile_screen/order_history.dart';
+import 'package:mingly/src/screens/protected/profile_screen/order_history_details.dart';
 import 'package:mingly/src/screens/protected/profile_screen/point_history.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_screen.dart';
 import 'package:mingly/src/screens/protected/profile_screen/voucher_list.dart';
@@ -183,6 +185,14 @@ class AppRouter {
         GoRoute(
           path: '/point-history',
           builder: (context, state) => PointsHistoryScreen(),
+        ),
+        GoRoute(
+          path: '/order-history',
+          builder: (context, state) => OrderHistoryPage(),
+        ),
+        GoRoute(
+          path: '/order-history-details',
+          builder: (context, state) => OrderDetailsPage(),
         ),
         // Shell routing for protected pages
         ShellRoute(

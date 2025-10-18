@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mingly/src/application/point_history/model/point_history_model.dart';
 import 'package:mingly/src/application/point_history/repo/point_history_repo.dart';
+import 'package:mingly/src/application/profile/model/order_history_model.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
 import 'package:mingly/src/application/profile/model/voucher_model.dart';
 import 'package:mingly/src/application/profile/repo/profile_repo.dart';
@@ -10,6 +11,7 @@ import 'package:mingly/src/application/profile/repo/profile_repo.dart';
 class ProfileProvider extends ChangeNotifier {
   ProfileModel profileModel = ProfileModel();
 
+  OrderHistoryModel orderHistoryModel = OrderHistoryModel();
   List<VoucherModel> voucherList = [];
   PointHistory pointHistory = PointHistory();
   bool isLoading = false;
@@ -66,5 +68,21 @@ class ProfileProvider extends ChangeNotifier {
       pointHistory = PointHistory.fromJson(response);
       notifyListeners();
     }
+  }
+
+  Future<void> getOrderHistory() async {
+    final response = await ProfileRepo().getOrderHistory();
+    if (response != null) {
+      orderHistoryModel = response;
+      notifyListeners();
+    }
+  }
+
+  Orders? selectedOrder;
+  void selectedOrderHistory(String id) {
+    selectedOrder = orderHistoryModel.orders!.firstWhere(
+      (order) => order.orderNumber == id,
+    );
+    notifyListeners();
   }
 }

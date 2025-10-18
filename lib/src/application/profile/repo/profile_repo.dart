@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:mingly/src/api_service/api_service.dart';
+import 'package:mingly/src/application/profile/model/order_history_model.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
 import 'package:mingly/src/application/profile/model/voucher_model.dart';
 import 'package:mingly/src/constant/app_urls.dart';
@@ -41,6 +42,19 @@ class ProfileRepo {
       return reseponse.map((e) => VoucherModel.fromJson(e)).toList();
     } else {
       return [];
+    }
+  }
+
+  Future<OrderHistoryModel> getOrderHistory() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().getData(
+      AppUrls.getOrderHistory,
+      authToken: preferences.getString("authToken"),
+    );
+    if (reseponse.isNotEmpty) {
+      return OrderHistoryModel.fromJson(reseponse);
+    } else {
+      return OrderHistoryModel.fromJson(reseponse);
     }
   }
 }

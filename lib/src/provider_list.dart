@@ -19,6 +19,7 @@ class ProviderList {
     ChangeNotifierProvider(create: (_) => BottleProvider()..getBottleList()),
     ChangeNotifierProvider(
       create: (_) => ProfileProvider()
+        ..getOrderHistory()
         ..getProfile()
         ..getPointHistory()
         ..getVoucherList(),

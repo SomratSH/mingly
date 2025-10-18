@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
+import 'package:provider/provider.dart';
 
 void showCustomConfirmDialog(BuildContext context) {
   showDialog(
@@ -192,6 +194,7 @@ void showCustomConfirmDialogEventTicket(
     barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
+      final provider = context.watch<ProfileProvider>();
       return Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Container(
@@ -261,7 +264,7 @@ void showCustomConfirmDialogEventTicket(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Bob Smith',
+                    provider.profileModel!.data!.fullName ?? 'N/A',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.65,
@@ -271,7 +274,7 @@ void showCustomConfirmDialogEventTicket(
                   ),
                   SizedBox(width: 20),
                   Text(
-                    '+1 6546 654 542',
+                    provider.profileModel!.data!.mobile ?? 'N/A',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.65,

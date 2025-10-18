@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -124,22 +126,26 @@ class VoucherListScreen extends StatelessWidget {
                       onPressed: isUsed
                           ? null
                           : () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Code copied: ${provider.voucherList[index].code}}",
-                                  ),
+                              Clipboard.setData(
+                                ClipboardData(
+                                  text: provider.voucherList[index].code
+                                      .toString(),
                                 ),
+                              );
+                              CustomSnackbar.show(
+                                context,
+                                message:
+                                    "Code copied: ${provider.voucherList[index].code}",
                               );
                             },
                       icon: const Icon(
                         Icons.copy,
                         size: 16,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                       label: const Text(
                         "Copy Code",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -148,7 +154,7 @@ class VoucherListScreen extends StatelessWidget {
                         ),
                         backgroundColor: isUsed
                             ? Colors.grey
-                            : Colors.blue.shade600,
+                            : Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

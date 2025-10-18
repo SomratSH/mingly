@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/constant/app_urls.dart';
+import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +13,7 @@ class VenueListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final venuesProvider = context.watch<VenueProvider>();
+    final eventProvider = context.watch<EventsProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -177,13 +181,26 @@ class VenueListScreen extends StatelessWidget {
                 children: List.generate(
                   venuesProvider.venuesList.length,
                   (index) => _VenueCard(
-                    onTap: () => context.push("/venue-detail"),
-                    image: 'lib/assets/images/dummy_event.png',
+                    onTap: () async {
+                      LoadingDialog.show(context);
+                      venuesProvider.selectedVenue(
+                        venuesProvider.venuesList[index].id,
+                      );
+                      await eventProvider.getEvetListVuneWise(
+                        venuesProvider.venuesList[index].id!.toInt(),
+                      );
+                      LoadingDialog.hide(context);
+                      context.push("/venue-detail");
+                    },
+                    image: venuesProvider.venuesList[index].picture == null
+                        ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                        : "${AppUrls.imageUrl}${venuesProvider.venuesList[index].picture.toString()}",
                     title: venuesProvider.venuesList[index].name.toString(),
                     location: venuesProvider.venuesList[index].address
                         .toString(),
-                    time:
-                        " ${venuesProvider.venuesList[index].openingHours![0].open.toString()} - ${venuesProvider.venuesList[index].openingHours![0].close.toString()}",
+                    time: venuesProvider.venuesList[index].openingHours!.isEmpty
+                        ? ""
+                        : "${venuesProvider.venuesList[index].openingHours![0].open.toString()} - ${venuesProvider.venuesList[index].openingHours![0].close.toString()}",
                   ),
                 ),
               ),
@@ -227,7 +244,7 @@ class _VenueCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child: Image.asset(
+                  child: Image.network(
                     image,
                     height: 140,
                     width: double.infinity,

@@ -47,23 +47,25 @@ class _Layout extends StatelessWidget {
             ),
             // List of favorites
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: provider.favouriteList.length,
-                itemBuilder: (context, index) {
-                  final fav = provider.favouriteList[index];
-                  return InkWell(
-                    onTap: () => context.push('/venue-detail'),
-                    child: FavouriteCard(
-                      title: fav.eventName.toString(),
-                      location:
-                          "${fav.address.toString()}, ${fav.city.toString()}, ${fav.state.toString()}, ${fav.country.toString()}",
-                      imagePath: fav.eventPicture.toString(),
-                      iconPath: "lib/assets/icons/mdi_heart.svg",
+              child: provider.favouriteList.isEmpty
+                  ? Center(child: Text("NO favourite"))
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: provider.favouriteList.length,
+                      itemBuilder: (context, index) {
+                        final fav = provider.favouriteList[index];
+                        return InkWell(
+                          onTap: () => context.push('/venue-detail'),
+                          child: FavouriteCard(
+                            title: fav.eventName.toString(),
+                            location:
+                                "${fav.address.toString()}, ${fav.city.toString()}, ${fav.state.toString()}, ${fav.country.toString()}",
+                            imagePath: fav.eventPicture.toString(),
+                            iconPath: "lib/assets/icons/mdi_heart.svg",
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

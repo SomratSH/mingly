@@ -19,6 +19,24 @@ class EventsRepo {
     return response.map((e) => EventsModel.fromJson(e)).toList();
   }
 
+  Future<List<EventsModel>> getEventsSearch(String search, String date) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final response = await ApiService().getList(
+      "${AppUrls.eventsUrl}?search=$search&date=$date",
+      authToken: preferences.getString("authToken"),
+    );
+    return response.map((e) => EventsModel.fromJson(e)).toList();
+  }
+
+  Future<List<EventsModel>> getEventsVenuseWise(int id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final response = await ApiService().getList(
+      "/venue/${id}/events/",
+      authToken: preferences.getString("authToken"),
+    );
+    return response.map((e) => EventsModel.fromJson(e)).toList();
+  }
+
   Future<EventDetailsModel> getEventsDetails(String id) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final response = await ApiService().getData(
@@ -76,6 +94,16 @@ class EventsRepo {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final reseponse = await ApiService().getData(
       AppUrls.getPopularEvent,
+      authToken: preferences.getString("authToken"),
+    );
+    return reseponse;
+  }
+
+  Future<Map<String, dynamic>> getEventCategories(int id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().postData(
+      "/reserve/${id}/event/",
+      {},
       authToken: preferences.getString("authToken"),
     );
     return reseponse;

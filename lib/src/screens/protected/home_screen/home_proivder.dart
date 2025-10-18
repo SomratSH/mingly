@@ -11,6 +11,11 @@ class HomeProivder extends ChangeNotifier {
   List<LeaderBoardModel> leaderBoardList = [];
   List<PakageModel> packageList = [];
   String addressUser = "N/A";
+  List<String> addImageList = [
+    "https://cdn.venngage.com/template/thumbnail/small/37de5deb-1ca7-4e60-b254-374b08708817.webp",
+    "https://www.shutterstock.com/shutterstock/photos/404977951/display_1500/stock-vector-template-for-poster-advertising-music-event-404977951.jpg",
+    "https://www.eventbookings.com/wp-content/uploads/2023/06/Purple-Black-Tropical-Party-Club-Poster-724x1024.jpg",
+  ];
 
   Future<void> getLeaderBoardlist() async {
     final response = await HomeRepo().getLeaderBoard();
@@ -89,5 +94,11 @@ class HomeProivder extends ChangeNotifier {
     } catch (e) {
       "Location not available: $e";
     }
+  }
+
+  getHomeData() async {
+    await getLeaderBoardlist();
+    await getPackagelist();
+    await getCurrentLocationName();
   }
 }

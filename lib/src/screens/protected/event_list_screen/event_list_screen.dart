@@ -6,13 +6,46 @@ import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:provider/provider.dart';
 
-class EventListScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
+
+  @override
+  State<EventListScreen> createState() => _EventListScreenState();
+}
+
+class _EventListScreenState extends State<EventListScreen> {
+  String _searchQuery = "";
+  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
+
+    // Apply filters
+    final filteredEvents = eventProvider.eventsList.where((event) {
+      final matchesSearch =
+          _searchQuery.isEmpty ||
+          (event.eventName?.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
+              false) ||
+          (event.venueName?.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
+              false);
+
+      final matchesDate = _selectedDate == null
+          ? true
+          : DateTime.tryParse(event.createdAt ?? '')?.toLocal().day ==
+                _selectedDate?.day;
+
+      return matchesSearch && matchesDate;
+    }).toList();
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -24,36 +57,88 @@ class EventListScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text('Event List', style: TextStyle(color: Colors.white)),
-        centerTitle: false,
       ),
       body: Column(
         children: [
-          // Top Filter/Search Row
+          // Search + Date Row
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: Row(
               children: [
+                // Date filter
                 Expanded(
-                  child: Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade900,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2023),
+                        lastDate: DateTime(2030),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.dark(
+                                primary: Color(0xFFD1B26F),
+                                onPrimary: Colors.white,
+                                surface: Color(0xFF1F2937),
+                                onSurface: Colors.white,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+
+                      if (picked != null) {
+                        setState(() => _selectedDate = picked);
+                      }
+                      await eventProvider.getEventListSearch(
+                        _selectedDate.toString(),
+                        _searchQuery,
+                      );
+                    },
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.calendar_today, color: Color(0xFFD1B26F)),
-                        SizedBox(width: 8),
-                        Text('Date', style: TextStyle(color: Colors.white)),
-                      ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.calendar_today,
+                            color: Color(0xFFD1B26F),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _selectedDate == null
+                                ? "Date"
+                                : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          if (_selectedDate != null)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _selectedDate = null),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+
+                // Search bar
                 Expanded(
+                  flex: 3,
                   child: Container(
                     height: 48,
                     decoration: BoxDecoration(
@@ -63,13 +148,22 @@ class EventListScreen extends StatelessWidget {
                         bottomRight: Radius.circular(12),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.search, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text('Search', style: TextStyle(color: Colors.white)),
-                      ],
+                    child: TextField(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: 'Search events...',
+                        hintStyle: TextStyle(color: Colors.grey),
+                        prefixIcon: Icon(Icons.search, color: Colors.white),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onChanged: (value) async {
+                        setState(() => _searchQuery = value);
+                        await eventProvider.getEventListSearch(
+                          _selectedDate.toString(),
+                          _searchQuery,
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -79,38 +173,46 @@ class EventListScreen extends StatelessWidget {
 
           // Event Grid
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.7,
-              ),
-              itemCount: eventProvider.eventsList.length,
-              itemBuilder: (context, index) {
-                final event = eventProvider.eventsList[index];
-                return _EventCard(
-                  onTap: () async {
-                    LoadingDialog.show(context);
-                    eventProvider.selectEventModelFunction(event);
-                    await eventProvider.getEventsDetailsData(
-                      event.id.toString(),
-                    );
-                    LoadingDialog.hide(context);
-                    context.push(
-                      "/event-detail",
-                      extra: eventProvider.eventsList[index],
-                    );
-                  },
-                  date: event.createdAt ?? "",
-                  image: event.image.toString(),
-                  title: event.eventName ?? "",
-                  location: event.venueName ?? "",
-                  country: event.currency ?? "",
-                );
-              },
-            ),
+            child: filteredEvents.isEmpty
+                ? const Center(
+                    child: Text(
+                      "No events found",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  )
+                : GridView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: 8,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.7,
+                        ),
+                    itemCount: filteredEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = filteredEvents[index];
+                      return _EventCard(
+                        onTap: () async {
+                          LoadingDialog.show(context);
+                          eventProvider.selectEventModelFunction(event);
+                          await eventProvider.getEventsDetailsData(
+                            event.id.toString(),
+                          );
+                          LoadingDialog.hide(context);
+                          context.push("/event-detail", extra: event);
+                        },
+                        date: event.createdAt ?? "",
+                        image: event.image.toString(),
+                        title: event.eventName ?? "",
+                        location: event.venueName ?? "",
+                        country: event.currency ?? "",
+                      );
+                    },
+                  ),
           ),
         ],
       ),

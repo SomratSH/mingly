@@ -17,4 +17,10 @@ class VenueProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  VenuesModel selectedVenueData = VenuesModel();
+  void selectedVenue(int? id) {
+    selectedVenueData = venuesList.firstWhere((venue) => venue.id == id);
+    notifyListeners();
+  }
 }

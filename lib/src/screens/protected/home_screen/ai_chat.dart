@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -103,7 +104,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 : const Radius.circular(12),
           ),
         ),
-        child: Text(
+        child: SelectableText(
           msg["text"],
           style: const TextStyle(
             fontSize: 15,
@@ -146,18 +147,29 @@ class _AiChatScreenState extends State<AiChatScreen> {
           SafeArea(
             child: Container(
               padding: const EdgeInsets.all(10),
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.primary,
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _messageController,
                       style: const TextStyle(color: Colors.black87),
+                      cursorColor: Colors.black,
                       decoration: InputDecoration(
                         hintText: "Type your message...",
-                        hintStyle: const TextStyle(color: Colors.grey),
+                        hintStyle: const TextStyle(color: Colors.black),
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(color: Colors.black),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 10,
@@ -170,7 +182,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: sendMessage,
-                    icon: const Icon(Icons.send, color: Colors.blue),
+                    icon: const Icon(Icons.send, color: Colors.black),
                   ),
                 ],
               ),

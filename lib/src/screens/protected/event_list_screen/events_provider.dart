@@ -66,9 +66,13 @@ class EventsProvider extends ChangeNotifier {
     if (response != null) {
       eventDetailsModel = response;
       eventDetailsImageList.clear();
-      eventDetailsImageList = List<String>.from(
-        jsonDecode(eventDetailsModel.images!.first.imageGl.toString()),
-      );
+      eventDetailsImageList =
+          eventDetailsModel.images!.first.imageGl == null ||
+              eventDetailsModel.images!.first.imageGl!.isEmpty
+          ? []
+          : List<String>.from(
+              jsonDecode(eventDetailsModel.images!.first.imageGl.toString()),
+            );
       eventDetailsImageList.forEach((e) {
         print(e);
       });

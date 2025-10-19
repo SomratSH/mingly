@@ -6,6 +6,7 @@ import 'package:mingly/src/application/events/model/event_ticket_model.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
 import 'package:mingly/src/application/events/model/menu_booking_model.dart';
 import 'package:mingly/src/application/events/model/popular_model.dart';
+import 'package:mingly/src/application/events/model/recomended_event_model.dart';
 import 'package:mingly/src/application/events/model/table_order_model.dart';
 import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/application/events/model/ticket_order_model.dart';
@@ -212,20 +213,30 @@ class EventsProvider extends ChangeNotifier {
 
   //event table ticket list
   TableTicketModel tableTicketModel = TableTicketModel();
-  Future<void> getTableTicketList() async {
+  Future<bool> getTableTicketList(String date, String time) async {
     final response = await EventsRepo().getTableTicket(
       selectEventModel.id.toString(),
-      "2025-04-30",
-      "17:00",
+      date,
+      time,
     );
-    if (response.isNotEmpty) {
+    if (response.isNotEmpty && response['tables'] != null) {
       tableTicketModel = TableTicketModel.fromJson(response);
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
   List<String> getChair(int id) {
-    return tableTicketModel.tables!.firstWhere((e) => e.id == id).chairs!;
+    for (var e in tableTicketModel.tables!) {
+      if (e.id == id) {
+        if (e.chairs == null || e.chairs!.isEmpty) {
+          return [];
+        }
+        return e.chairs!;
+      }
+    }
+    return [];
   }
 
   String? selectedCategory;
@@ -273,11 +284,19 @@ class EventsProvider extends ChangeNotifier {
   }
 
   PopularEventModel popularEventModel = PopularEventModel();
-
+  RecomendedEventModel recomendedEventModel = RecomendedEventModel();
   Future<void> getPopularEventList() async {
     final response = await EventsRepo().getPopularEvent();
     if (response.isNotEmpty) {
       popularEventModel = PopularEventModel.fromJson(response);
+      notifyListeners();
+    }
+  }
+
+  Future<void> getRecomendedEventList() async {
+    final response = await EventsRepo().getRecomendedEvent();
+    if (response.isNotEmpty) {
+      recomendedEventModel = RecomendedEventModel.fromJson(response);
       notifyListeners();
     }
   }
@@ -306,12 +325,12 @@ class EventsProvider extends ChangeNotifier {
   List<EventsModel> eventsListVenueWise = [];
   Future<void> getEvetListVuneWise(int id) async {
     final response = await EventsRepo().getEventsVenuseWise(id);
-
+    eventsListVenueWise.clear();
     if (response.isNotEmpty) {
       List<EventsModel> data = response;
-      eventsListVenueWise.clear();
+
       for (var e in data) {
-        eventsList.add(e);
+        eventsListVenueWise.add(e);
       }
     }
     notifyListeners();

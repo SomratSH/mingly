@@ -74,7 +74,7 @@ class Tables {
     w = json['w'];
     h = json['h'];
     shape = json['shape'];
-    chairs = json['chairs'].cast<String>();
+    chairs = json['chairs']?.cast<String>();
   }
 
   Map<String, dynamic> toJson() {

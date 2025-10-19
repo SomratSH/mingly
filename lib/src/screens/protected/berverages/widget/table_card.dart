@@ -36,12 +36,14 @@ class TableCard extends StatelessWidget {
                 Row(
                   children: [
                     Text("No : "),
-                    Row(
-                      children: List.generate(
-                        no.length,
-                        (index) => Text("${no[index]} "),
-                      ),
-                    ),
+                    no.isEmpty
+                        ? Text("No chairs selected")
+                        : Row(
+                            children: List.generate(
+                              no.length,
+                              (index) => Text("${no[index]} "),
+                            ),
+                          ),
                   ],
                 ),
                 _buildRow("Down Payment:", downPayment),

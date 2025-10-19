@@ -41,8 +41,7 @@ class _EventListScreenState extends State<EventListScreen> {
 
       final matchesDate = _selectedDate == null
           ? true
-          : DateTime.tryParse(event.createdAt ?? '')?.toLocal().day ==
-                _selectedDate?.day;
+          : DateTime.tryParse('')?.toLocal().day == _selectedDate?.day;
 
       return matchesSearch && matchesDate;
     }).toList();
@@ -205,8 +204,8 @@ class _EventListScreenState extends State<EventListScreen> {
                           LoadingDialog.hide(context);
                           context.push("/event-detail", extra: event);
                         },
-                        date: event.createdAt ?? "",
-                        image: event.image.toString(),
+                        date: "",
+                        image: event.images!.first.thumbnailImage!,
                         title: event.eventName ?? "",
                         location: event.venueName ?? "",
                         country: event.currency ?? "",
@@ -267,7 +266,7 @@ class _EventCard extends StatelessWidget {
                         topRight: Radius.circular(16),
                       ),
                       child: Image.network(
-                        AppUrls.imageUrl + image,
+                        AppUrls.imageUrlNgrok + image,
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,

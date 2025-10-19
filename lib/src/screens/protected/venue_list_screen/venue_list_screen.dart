@@ -5,15 +5,51 @@ import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
 
-class VenueListScreen extends StatelessWidget {
+class VenueListScreen extends StatefulWidget {
   const VenueListScreen({super.key});
+
+  @override
+  State<VenueListScreen> createState() => _VenueListScreenState();
+}
+
+class _VenueListScreenState extends State<VenueListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final venuesProvider = context.watch<VenueProvider>();
     final eventProvider = context.watch<EventsProvider>();
+
+    // Filtered venue list
+    final filteredVenues = venuesProvider.venuesList.where((venue) {
+      final name = venue.name?.toLowerCase() ?? '';
+      final address = venue.address?.toLowerCase() ?? '';
+      return name.contains(searchQuery) || address.contains(searchQuery);
+    }).toList();
+    String countryValue;
+    String stateValue;
+    String cityValue;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -44,6 +80,7 @@ class VenueListScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             Row(
               children: [
                 Expanded(
@@ -159,51 +196,63 @@ class VenueListScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
+            // 🔍 Search Field
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade900,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search, color: Colors.white70),
-                  hintText: 'Search',
+                  hintText: 'Search venues...',
                   hintStyle: TextStyle(color: Colors.white54),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 16),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
             const SizedBox(height: 16),
+
+            // 📋 Venue list (filtered)
             Expanded(
-              child: ListView(
-                children: List.generate(
-                  venuesProvider.venuesList.length,
-                  (index) => _VenueCard(
-                    onTap: () async {
-                      LoadingDialog.show(context);
-                      venuesProvider.selectedVenue(
-                        venuesProvider.venuesList[index].id,
-                      );
-                      await eventProvider.getEvetListVuneWise(
-                        venuesProvider.venuesList[index].id!.toInt(),
-                      );
-                      LoadingDialog.hide(context);
-                      context.push("/venue-detail");
-                    },
-                    image: venuesProvider.venuesList[index].picture == null
-                        ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                        : "${AppUrls.imageUrl}${venuesProvider.venuesList[index].picture.toString()}",
-                    title: venuesProvider.venuesList[index].name.toString(),
-                    location: venuesProvider.venuesList[index].address
-                        .toString(),
-                    time: venuesProvider.venuesList[index].openingHours!.isEmpty
-                        ? ""
-                        : "${venuesProvider.venuesList[index].openingHours![0].open.toString()} - ${venuesProvider.venuesList[index].openingHours![0].close.toString()}",
-                  ),
-                ),
-              ),
+              child: filteredVenues.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "No venues found",
+                        style: TextStyle(color: Colors.white54),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredVenues.length,
+                      itemBuilder: (context, index) {
+                        final venue = filteredVenues[index];
+                        return _VenueCard(
+                          onTap: () async {
+                            LoadingDialog.show(context);
+                            venuesProvider.selectedVenue(venue.id);
+                            await eventProvider.getEvetListVuneWise(
+                              venue.id!.toInt(),
+                            );
+                            LoadingDialog.hide(context);
+                            context.push("/venue-detail");
+                          },
+                          image:
+                              venue.images!.isEmpty ||
+                                  venue.images!.first.imageUrl == null
+                              ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                              : "${AppUrls.imageUrlNgrok}${venue.images!.first.imageUrl!}",
+                          title: venue.name ?? '',
+                          location: venue.address ?? '',
+                          time: venue.openingHours!.isEmpty
+                              ? ""
+                              : "${venue.openingHours![0].open} - ${venue.openingHours![0].close}",
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -211,6 +260,8 @@ class VenueListScreen extends StatelessWidget {
     );
   }
 }
+
+// Reuse your _VenueCard widget (assuming it's already defined elsewhere)
 
 class _VenueCard extends StatelessWidget {
   final String image;
@@ -229,7 +280,7 @@ class _VenueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: InkWell(
         onTap: onTap,
         child: Card(

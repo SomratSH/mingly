@@ -53,4 +53,6 @@ class AppUrls {
   static String addToFav = "/favourite/";
 
   static String getOrderHistory = "/order-history/";
+
+  static String getRecomendedEvent = "/recommended-events/";
 }

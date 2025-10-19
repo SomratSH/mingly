@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
@@ -167,20 +168,30 @@ class VenueDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              Column(
-                children: List.generate(eventProvider.eventsListVenueWise.length, (
-                  index,
-                ) {
-                  return _PopularEventCard(
-                    image:
-                        eventProvider.eventsListVenueWise[index].image == null
-                        ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                        : "${AppUrls.imageUrl}${eventProvider.eventsListVenueWise[index].image}",
-                    name: eventProvider.eventsListVenueWise[index].eventName
-                        .toString(),
-                  );
-                }),
-              ),
+              eventProvider.eventsListVenueWise.isEmpty
+                  ? Text("No event available!!")
+                  : Column(
+                      children: List.generate(
+                        eventProvider.eventsListVenueWise.length,
+                        (index) {
+                          return _PopularEventCard(
+                            image:
+                                eventProvider
+                                        .eventsListVenueWise[index]
+                                        .images!
+                                        .first
+                                        .thumbnailImage ==
+                                    null
+                                ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                                : "${AppUrls.imageUrlNgrok}${eventProvider.eventsListVenueWise[index].images!.first.thumbnailImage}",
+                            name: eventProvider
+                                .eventsListVenueWise[index]
+                                .eventName
+                                .toString(),
+                          );
+                        },
+                      ),
+                    ),
               const SizedBox(height: 32),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -196,7 +207,11 @@ class VenueDetailScreen extends StatelessWidget {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          openMapToAddress(
+                            "${provider.selectedVenueData.address.toString()}, ${provider.selectedVenueData.city.toString()}, ${provider.selectedVenueData.state.toString()}, ${provider.selectedVenueData.country.toString()}",
+                          );
+                        },
                         child: const Text('Direction'),
                       ),
                     ),

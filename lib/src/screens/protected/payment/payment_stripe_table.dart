@@ -20,7 +20,8 @@ class StripePaymentWebViewTable extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StripePaymentWebViewTable> createState() => _StripePaymentWebViewTableState();
+  State<StripePaymentWebViewTable> createState() =>
+      _StripePaymentWebViewTableState();
 }
 
 class _StripePaymentWebViewTableState extends State<StripePaymentWebViewTable> {
@@ -36,7 +37,7 @@ class _StripePaymentWebViewTableState extends State<StripePaymentWebViewTable> {
   void _showSuccessSnackBar() {
     CustomSnackbar.show(
       context,
-      message: "Payment Successful!\nYour subscription has been activated",
+      message: "Payment Successful!\nYour table has been sucessfully booked.",
     );
   }
 
@@ -94,8 +95,6 @@ class _StripePaymentWebViewTableState extends State<StripePaymentWebViewTable> {
               Navigator.of(context).pop(false);
               return NavigationDecision.prevent;
             }
-
-          
 
             return NavigationDecision.navigate;
           },

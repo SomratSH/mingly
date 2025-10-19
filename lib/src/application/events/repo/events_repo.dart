@@ -108,4 +108,13 @@ class EventsRepo {
     );
     return reseponse;
   }
+
+  Future getRecomendedEvent() async {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().getData(
+      AppUrls.getRecomendedEvent,
+      authToken: preferences.getString("authToken"),
+    );
+    return reseponse;
+  }
 }

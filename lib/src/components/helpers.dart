@@ -4,14 +4,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mingly/src/components/buttons.dart';
 import 'package:intl/intl.dart';
 import 'inputs.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:geolocator/geolocator.dart';
 
 /// A customizable primary button widget that displays a gradient background.
-/// 
+///
 /// This widget wraps a [GradientButton] and provides a consistent style for primary actions.
-/// 
+///
 /// - [text]: The label displayed on the button.
 /// - [onPressed]: The callback triggered when the button is pressed.
-/// 
+///
 /// The button uses a fixed gradient color scheme and does not expand to full width.
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -37,7 +40,7 @@ class PrimaryButton extends StatelessWidget {
 }
 
 /// A single-line text field using [CustomInputField] from inputs.dart.
-/// 
+///
 /// - [controller]: Controls the text being edited.
 /// - [hintText]: Placeholder text shown when the field is empty.
 /// - [onChanged]: Callback when the text changes.
@@ -72,16 +75,15 @@ class SingleLineTextField extends StatelessWidget {
 }
 
 /// A password input field using [CustomInputField] from inputs.dart.
-/// 
+///
 /// This widget provides a secure text field for password entry, hiding the input by default.
-/// 
+///
 /// - [controller]: Controls the text being edited.
 /// - [hintText]: Placeholder text shown when the field is empty.
 /// - [onChanged]: Callback when the text changes.
 /// - [obscureText]: Whether to obscure the text (defaults to true).
-/// 
+///
 /// The field uses a single line and disables suggestions and autocorrect for privacy.
-
 
 class PasswordInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -101,7 +103,6 @@ class PasswordInputField extends StatefulWidget {
   State<PasswordInputField> createState() => _PasswordInputFieldState();
 }
 
-
 class _PasswordInputFieldState extends State<PasswordInputField> {
   @override
   Widget build(BuildContext context) {
@@ -118,7 +119,6 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
   }
 }
 
-
 String formatTimeToAmPm(String time24) {
   try {
     // Parse input time (24-hour format)
@@ -134,13 +134,12 @@ String formatTimeToAmPm(String time24) {
 
 String formatDate(String isoString) {
   try {
-    DateTime dateTime = DateTime.parse(isoString).toLocal(); 
+    DateTime dateTime = DateTime.parse(isoString).toLocal();
     return DateFormat("dd MMM yyyy").format(dateTime);
   } catch (e) {
     return isoString; // fallback if invalid
   }
 }
-
 
 String formatDateTime(String utcString) {
   try {
@@ -156,5 +155,44 @@ String formatDateTime(String utcString) {
   } catch (e) {
     // Return original string if parsing fails
     return utcString;
+  }
+}
+
+
+Future<void> openMapToAddress(String destinationAddress) async {
+  // Step 1: Get permission
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw 'Location permission denied';
+    }
+  }
+
+  // Step 2: Get current position
+  Position position = await Geolocator.getCurrentPosition();
+
+  // Step 3: Create the URL
+  final Uri googleMapUrl = Uri.parse(
+    'https://www.google.com/maps/dir/?api=1'
+    '&origin=${position.latitude},${position.longitude}'
+    '&destination=${Uri.encodeComponent(destinationAddress)}'
+    '&travelmode=driving',
+  );
+
+  // Step 4: Try opening in external app first, fallback to browser
+  try {
+    final launched = await launchUrl(
+      googleMapUrl,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      // fallback to browser
+      await launchUrl(googleMapUrl, mode: LaunchMode.inAppBrowserView);
+    }
+  } catch (e) {
+    // ultimate fallback
+    await launchUrl(googleMapUrl, mode: LaunchMode.platformDefault);
   }
 }

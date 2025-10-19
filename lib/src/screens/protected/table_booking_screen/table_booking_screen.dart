@@ -216,6 +216,15 @@ class TableBookingScreen extends StatelessWidget {
                     '${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsModel.images!.first.seatingPlan}',
                     height: 200,
                     fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint("❌ Image load failed: $error");
+                      return Image.network(
+                        'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                        fit: BoxFit.cover,
+                        height: 160,
+                        width: double.infinity,
+                      );
+                    },
                   ),
                 ),
               ),

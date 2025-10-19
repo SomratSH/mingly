@@ -14,7 +14,8 @@ class ProviderList {
     ChangeNotifierProvider(
       create: (_) => EventsProvider()
         ..getEventList()
-        ..getPopularEventList(),
+        ..getPopularEventList()
+        ..getRecomendedEventList(),
     ),
     ChangeNotifierProvider(create: (_) => BottleProvider()..getBottleList()),
     ChangeNotifierProvider(

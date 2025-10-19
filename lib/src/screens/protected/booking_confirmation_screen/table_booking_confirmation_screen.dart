@@ -38,7 +38,8 @@ class TableBookingConfirmationScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 16),
               Text(
-                eventProvider.selectEventModel.eventName.toString(),
+                // eventProvider.selectEventModel.eventName.toString(),
+                "fdsaf",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -130,7 +131,11 @@ class TableBookingConfirmationScreen extends StatelessWidget {
               ),
               SizedBox(height: 10),
               TableCard(
-                no: eventProvider.getChair(eventProvider.tableBooking.seatId!),
+                no:
+                    eventProvider.getChair(
+                      eventProvider.tableBooking.seatId!,
+                    ) ??
+                    [],
                 downPayment: "IDR 250,000",
                 minimumCharge: "IDR 230,000",
                 tableCount: "1",

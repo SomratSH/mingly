@@ -11,9 +11,9 @@ class VenuesModel {
   String? latitude;
   String? longitude;
   int? capacity;
-  Null? seatingLayout;
-  Null? facilities;
-  Null? contactPerson;
+  String? seatingLayout;
+  String? facilities;
+  String? contactPerson;
   String? contactEmail;
   String? contactPhone;
   String? websiteUrl;

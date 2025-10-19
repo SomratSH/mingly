@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
@@ -210,12 +211,20 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                     onPressed: () async {
                       LoadingDialog.show(context);
-                      await eventProvider.getEventTicketList(
+                      final status = await eventProvider.getEventTicketList(
                         model.id.toString(),
                       );
 
                       LoadingDialog.hide(context);
-                      context.push("/ticket-booking");
+                      if (status) {
+                        context.push("/ticket-booking");
+                      } else {
+                        CustomSnackbar.show(
+                          context,
+                          message: "No tickets available for this event",
+                          backgroundColor: Colors.red,
+                        );
+                      }
                     },
                     child: const Text('Book Ticket'),
                   ),
@@ -233,9 +242,22 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                     onPressed: () async {
                       LoadingDialog.show(context);
-                      await eventProvider.getTableTicketList();
+                      final status = await eventProvider.getTableTicketList(
+                        eventProvider.eventDetailsModel.firstSessionDate
+                            .toString(),
+                        eventProvider.eventDetailsModel.sessionStartTime
+                            .toString(),
+                      );
                       LoadingDialog.hide(context);
-                      context.push("/table-booking");
+                      if (status) {
+                        context.push("/table-booking");
+                      } else {
+                        CustomSnackbar.show(
+                          context,
+                          message: "No tables available for this event",
+                          backgroundColor: Colors.red,
+                        );
+                      }
                     },
                     child: const Text('Sofa & Table'),
                   ),

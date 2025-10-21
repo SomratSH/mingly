@@ -2,9 +2,13 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/constant/app_urls.dart';
+import 'package:mingly/src/screens/protected/berverages/widget/menu_card.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/venue_detail_screen/menu_card.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -52,9 +56,9 @@ class VenueDetailScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
-                  provider.selectedVenueData.picture == null
+                  provider.selectedVenueData.images == null
                       ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                      : "${AppUrls.imageUrl}${provider.selectedVenueData.picture}",
+                      : "${AppUrls.imageUrlNgrok}${provider.selectedVenueData.images!.first.imageUrl}",
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -72,127 +76,236 @@ class VenueDetailScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.grid_view, color: Color(0xFFD1B26F)),
-                          SizedBox(width: 8),
-                          Text(
-                            'Event List',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                    InkWell(
+                      onTap: () {
+                        provider.toggleMenuList();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.grid_view, color: Color(0xFFD1B26F)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Event List',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(height: 35, width: 1, color: Color(0xFF8E7A72)),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.menu_book, color: Color(0xFFD1B26F)),
-                          SizedBox(width: 8),
-                          Text(
-                            'View Menu',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                    InkWell(
+                      onTap: () {
+                        provider.toggleMenuList();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.menu_book, color: Color(0xFFD1B26F)),
+                            SizedBox(width: 8),
+                            Text(
+                              'View Menu',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: const [
-                  Icon(Icons.location_on, color: Color(0xFFD1B26F)),
-                  SizedBox(width: 8),
-                  Text(
-                    'Address',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                "${provider.selectedVenueData.address.toString()}, ${provider.selectedVenueData.city.toString()}, ${provider.selectedVenueData.state.toString()}, ${provider.selectedVenueData.country.toString()}",
-                style: TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: const [
-                  Icon(Icons.access_time, color: Color(0xFFD1B26F)),
-                  SizedBox(width: 8),
-                  Text(
-                    'Opening hour',
-                    style: TextStyle(
-                      color: Color(0xFFD1B26F),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: const [
-                  Text('Friday', style: TextStyle(color: Colors.white70)),
-                  SizedBox(width: 16),
-                  Text(
-                    '19:00 PM - 01:00 AM',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Popular Events',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  Text(
-                    'See All',
-                    style: TextStyle(color: theme.colorScheme.primary),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
 
-              eventProvider.eventsListVenueWise.isEmpty
-                  ? Text("No event available!!")
+              const SizedBox(height: 16),
+
+              //event list and other info
+              provider.isMenuList == false
+                  ? Column(
+                      children: [
+                        Row(
+                          children: const [
+                            Icon(Icons.location_on, color: Color(0xFFD1B26F)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Address',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "${provider.selectedVenueData.address.toString()}, ${provider.selectedVenueData.city.toString()}, ${provider.selectedVenueData.state.toString()}, ${provider.selectedVenueData.country.toString()}",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: const [
+                            Icon(Icons.access_time, color: Color(0xFFD1B26F)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Opening hour',
+                              style: TextStyle(
+                                color: Color(0xFFD1B26F),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: const [
+                            Text(
+                              'Friday',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            SizedBox(width: 16),
+                            Text(
+                              '19:00 PM - 01:00 AM',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Popular Events',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              'See All',
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        eventProvider.eventsListVenueWise.isEmpty
+                            ? Text("No event available!!")
+                            : Column(
+                                children: List.generate(
+                                  eventProvider.eventsListVenueWise.length,
+                                  (index) {
+                                    return InkWell(
+                                      onTap: () async {
+                                        LoadingDialog.show(context);
+                                        eventProvider.selectEventModelFunction(
+                                          eventProvider
+                                              .eventsListVenueWise[index],
+                                        );
+                                        await eventProvider
+                                            .getEventsDetailsData(
+                                              eventProvider
+                                                  .eventsListVenueWise[index]
+                                                  .id
+                                                  .toString(),
+                                            );
+                                        LoadingDialog.hide(context);
+                                        context.push(
+                                          "/event-detail",
+                                          extra: eventProvider
+                                              .eventsListVenueWise[index],
+                                        );
+                                      },
+                                      child: _PopularEventCard(
+                                        image:
+                                            eventProvider
+                                                        .eventsListVenueWise[index]
+                                                        .images ==
+                                                    null ||
+                                                eventProvider
+                                                        .eventsListVenueWise[index]
+                                                        .images!
+                                                        .first
+                                                        .thumbnailImage ==
+                                                    null
+                                            ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                                            : "${AppUrls.imageUrlNgrok}${eventProvider.eventsListVenueWise[index].images!.first.thumbnailImage}",
+                                        name: eventProvider
+                                            .eventsListVenueWise[index]
+                                            .eventName
+                                            .toString(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                        const SizedBox(height: 32),
+                      ],
+                    )
+                  : provider.venueMenuList.isEmpty
+                  ? Center(child: Text("No menu available"))
                   : Column(
-                      children: List.generate(
-                        eventProvider.eventsListVenueWise.length,
-                        (index) {
-                          return _PopularEventCard(
-                            image:
-                                eventProvider
-                                        .eventsListVenueWise[index]
-                                        .images!
-                                        .first
-                                        .thumbnailImage ==
-                                    null
-                                ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                                : "${AppUrls.imageUrlNgrok}${eventProvider.eventsListVenueWise[index].images!.first.thumbnailImage}",
-                            name: eventProvider
-                                .eventsListVenueWise[index]
-                                .eventName
-                                .toString(),
-                          );
-                        },
-                      ),
+                      children: List.generate(provider.venueMenuList.length, (
+                        index,
+                      ) {
+                        final item = provider.venueMenuList[index];
+                        return MenuCardVenue(
+                          item: item,
+                          onTap: () {
+                            // Example: navigate to detail page or show details modal.
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Text(item.name!),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.network(
+                                      item.image!,
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                                width: 120,
+                                                height: 120,
+                                                color: Colors.grey[500],
+                                                child: const Icon(
+                                                  Icons.image_not_supported,
+                                                ),
+                                              ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(item.description!),
+                                    const SizedBox(height: 8),
+                                    Text('Quantity: ${item.quantity}'),
+                                    Text(
+                                      'Price: ${double.parse(item.price!).toStringAsFixed(2)}',
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
                     ),
-              const SizedBox(height: 32),
+              provider.venueMenuList.isEmpty && provider.isMenuList
+                  ? SizedBox(height: 32)
+                  : const SizedBox(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Row(

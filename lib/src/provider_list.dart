@@ -23,7 +23,8 @@ class ProviderList {
         ..getOrderHistory()
         ..getProfile()
         ..getPointHistory()
-        ..getVoucherList(),
+        ..getVoucherList()
+        ..getPromoCodeList(),
     ),
     ChangeNotifierProvider(
       create: (_) => HomeProivder()

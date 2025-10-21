@@ -7,6 +7,8 @@ import 'package:mingly/src/application/profile/model/order_history_model.dart';
 import 'package:mingly/src/application/profile/model/profile_model.dart';
 import 'package:mingly/src/application/profile/model/voucher_model.dart';
 import 'package:mingly/src/application/profile/repo/profile_repo.dart';
+import 'package:mingly/src/application/promo_code/model/promo_code_model.dart';
+import 'package:mingly/src/application/promo_code/repo/promo_code_repo.dart';
 
 class ProfileProvider extends ChangeNotifier {
   ProfileModel profileModel = ProfileModel();
@@ -84,5 +86,23 @@ class ProfileProvider extends ChangeNotifier {
       (order) => order.orderNumber == id,
     );
     notifyListeners();
+  }
+
+  List<PromoCodeModel> promoCodeList = [];
+  Future<void> getPromoCodeList() async {
+    final response = await PromoCodeRepo().getPromoCodes();
+    if (response.isNotEmpty) {
+      promoCodeList = response;
+      notifyListeners();
+    }
+  }
+
+  getPromoValue(String code) {
+    for (var promo in promoCodeList) {
+      if (promo.code == code) {
+        return promo.discountValue;
+      }
+    }
+    return null;
   }
 }

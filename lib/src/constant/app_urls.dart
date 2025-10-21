@@ -2,7 +2,7 @@ class AppUrls {
   static String baseUrl = "http://10.10.13.20:8005/app/api/v1";
   static String imageUrl = "http://10.10.13.20:8005";
   // static String baseUrl = "https://080aadaa0adf.ngrok-free.app/app/api/v1";
-  static String imageUrlNgrok = "http://10.10.13.20:8000";
+  static String imageUrlNgrok = "http://10.10.13.11:8000";
   //authentication
   static String login = "/auth/login/";
   static String signUp = "/auth/signup/";
@@ -55,4 +55,6 @@ class AppUrls {
   static String getOrderHistory = "/order-history/";
 
   static String getRecomendedEvent = "/recommended-events/";
+
+  static String promoCodeUrl = "/get-promocodes/";
 }

@@ -67,7 +67,7 @@ class EventsProvider extends ChangeNotifier {
       eventDetailsModel = response;
       eventDetailsImageList.clear();
       eventDetailsImageList =
-          eventDetailsModel.images!.first.imageGl == null ||
+       eventDetailsModel.images == null ||   eventDetailsModel.images!.first.imageGl == null ||
               eventDetailsModel.images!.first.imageGl!.isEmpty
           ? []
           : List<String>.from(
@@ -80,6 +80,7 @@ class EventsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  double promoDiscount = 0.0;
   String getTotalPrice() {
     double totalPrice = 0.0;
 
@@ -89,7 +90,7 @@ class EventsProvider extends ChangeNotifier {
           double.parse(e.quantity.toString());
     });
 
-    return totalPrice.toString();
+    return (totalPrice).toString();
   }
 
   void selectEventModelFunction(EventsModel model) {
@@ -339,4 +340,18 @@ class EventsProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void calculateTotalAmountWithPromo(String promo) {
+    // Logic to calculate total amount with promo code
+    promoDiscount = double.tryParse(promo) ?? 0.0;
+    notifyListeners();
+  }
+
+  double promoValue = 0.0;
+  void addPromoValue() {
+    promoValue = promoDiscount;
+    notifyListeners();
+  }
+
+ 
 }

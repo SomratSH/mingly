@@ -266,6 +266,15 @@ class ProfileScreen extends StatelessWidget {
                 child: Container(height: 1, color: Colors.white),
               ),
               _ProfileMenuItem(
+                icon: Icons.card_giftcard,
+                title: 'Promo Code',
+                onTap: () => context.push("/promo-code"),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(height: 1, color: Colors.white),
+              ),
+              _ProfileMenuItem(
                 icon: Icons.logout,
                 title: 'Log Out',
                 onTap: () => showLogoutDialog(context),

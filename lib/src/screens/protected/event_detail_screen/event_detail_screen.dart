@@ -6,6 +6,7 @@ import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/components/helpers.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class EventDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
+    final venueProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -247,6 +249,13 @@ class EventDetailScreen extends StatelessWidget {
                             .toString(),
                         eventProvider.eventDetailsModel.sessionStartTime
                             .toString(),
+                      );
+                      await venueProvider.getVenueMenuList(
+                        int.parse(
+                          venueProvider.getVenueId(
+                            eventProvider.selectEventModel.venueName.toString(),
+                          ),
+                        ),
                       );
                       LoadingDialog.hide(context);
                       if (status) {

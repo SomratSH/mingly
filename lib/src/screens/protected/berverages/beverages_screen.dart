@@ -6,8 +6,10 @@ import 'package:mingly/src/screens/protected/berverages/widget/beverage_item_car
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/beverage_item_card.dart';
+import 'package:mingly/src/screens/protected/event_detail_screen/widget/event_menu_card.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
 class BeveragesScreen extends StatelessWidget {
@@ -17,6 +19,7 @@ class BeveragesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final eventProvider = context.watch<EventsProvider>();
     final bottleProvider = context.watch<BottleProvider>();
+    final venueProvider = context.watch<VenueProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -109,37 +112,64 @@ class BeveragesScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Column(
-                children: List.generate(
-                  bottleProvider.bottleList.length,
-                  (index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: BeverageItemCard(
-                      imagePath: "lib/assets/images/bottle_one.jpg",
-                      title: bottleProvider.bottleList[index].brand.toString(),
-                      number:
-                          "Qty - ${bottleProvider.bottleList[index].quantity.toString()}",
-                      keepingDate: formatDate(
-                        bottleProvider.bottleList[index].keepingDate.toString(),
-                      ),
-                      expiryDate: formatDate(
-                        bottleProvider.bottleList[index].expiredDate.toString(),
-                      ),
-                      buttonText: "Add",
-                      onTap: () {
-                        eventProvider.addMenu(
-                          bottleProvider.bottleList[index].id!,
-                          1,
-                        );
-                        CustomSnackbar.show(
-                          context,
-                          message: "Added menu sucessfully",
-                          backgroundColor: Colors.green,
-                        );
-                        print("Add button clicked!");
-                      },
-                    ),
-                  ),
-                ),
+                children: List.generate(venueProvider.venueMenuList.length, (
+                  index,
+                ) {
+                  final item = venueProvider.venueMenuList[index];
+                  return MenuCardVenue(
+                    item: item,
+                    additionalOnTap: () {
+                      eventProvider.addMenu(item.id!, 1);
+                      CustomSnackbar.show(
+                        context,
+                        message: "Added Successfully",
+                      );
+                    },
+                    onTap: () {
+                      // Example: navigate to detail page or show details modal.
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text(item.name!),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.network(
+                                item.image!,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                      width: 120,
+                                      height: 120,
+                                      color: Colors.grey[500],
+                                      child: const Icon(
+                                        Icons.image_not_supported,
+                                      ),
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(item.description!),
+                              const SizedBox(height: 8),
+                              Text('Quantity: ${item.quantity}'),
+                              Text(
+                                'Price: ${double.parse(item.price!).toStringAsFixed(2)}',
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }),
               ),
 
               Spacer(),

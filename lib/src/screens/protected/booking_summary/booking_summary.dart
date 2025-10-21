@@ -8,6 +8,7 @@ import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confi
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
 import 'package:mingly/src/screens/protected/payment/payment_stripe_table.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
 class BookingSummary extends StatelessWidget {
@@ -16,7 +17,7 @@ class BookingSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final eventProvider = context.watch<EventsProvider>();
-    final bottleProvider = context.watch<BottleProvider>();
+    final venueProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: Color(0xFF1A1A1A),
       appBar: AppBar(
@@ -268,12 +269,14 @@ class BookingSummary extends StatelessWidget {
                         (index) => Column(
                           children: [
                             MenuItemCard(
-                              menuName: bottleProvider.getBottleName(
+                              menuName: venueProvider.getMenuName(
                                 eventProvider.menuList[index].id!,
                               ),
-                              price: "\$15.00",
+                              price:
+                                  "\$${venueProvider.getMenuPrice(eventProvider.menuList[index].id!)}",
                               quantity: "2",
-                              subtotal: "\$30.00",
+                              subtotal:
+                                  "\$${venueProvider.getMenuPrice(eventProvider.menuList[index].id!)}",
                             ),
                             if (index != eventProvider.menuList.length - 1)
                               Divider(),

@@ -48,7 +48,7 @@ class _Layout extends StatelessWidget {
             // List of favorites
             Expanded(
               child: provider.favouriteList.isEmpty
-                  ? Center(child: Text("NO favourite"))
+                  ? Center(child: Text("No favourite"))
                   : ListView.builder(
                       padding: const EdgeInsets.all(8.0),
                       itemCount: provider.favouriteList.length,

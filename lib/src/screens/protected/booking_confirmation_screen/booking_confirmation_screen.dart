@@ -207,6 +207,8 @@ class BookingConfirmationScreen extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
+                        String promo = profileProvider.getPromoValue(value);
+                        eventProvider.calculateTotalAmountWithPromo(promo);
                         eventProvider.getPromoCode(value);
                       },
                       decoration: InputDecoration(
@@ -243,7 +245,9 @@ class BookingConfirmationScreen extends StatelessWidget {
                         vertical: 16,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      eventProvider.addPromoValue();
+                    },
                     child: const Text('Apply'),
                   ),
                 ],
@@ -258,14 +262,6 @@ class BookingConfirmationScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text('Promo', style: TextStyle(color: Colors.white)),
-                          Text('-', style: TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -283,12 +279,26 @@ class BookingConfirmationScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text('Promo', style: TextStyle(color: Colors.white)),
+                          Text(
+                            '${eventProvider.promoValue}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Text(
                             'Grand Total',
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            eventProvider.getTotalPrice(),
+                            (double.parse(eventProvider.getTotalPrice()) -
+                                    eventProvider.promoValue)
+                                .toString(),
+
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -309,7 +319,10 @@ class BookingConfirmationScreen extends StatelessWidget {
                   children: [
                     Text('Full Payment', style: TextStyle(color: Colors.black)),
                     Text(
-                      eventProvider.getTotalPrice(),
+                      (double.parse(eventProvider.getTotalPrice()) -
+                              eventProvider.promoValue)
+                          .toString(),
+
                       style: TextStyle(color: Colors.black),
                     ),
                   ],

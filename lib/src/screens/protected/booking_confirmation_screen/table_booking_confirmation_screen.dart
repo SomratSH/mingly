@@ -5,6 +5,7 @@ import 'package:mingly/src/screens/protected/berverages/widget/menu_card.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/table_card.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
 class TableBookingConfirmationScreen extends StatelessWidget {
@@ -14,7 +15,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
-    final bottleProvider = context.watch<BottleProvider>();
+    final venueProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -100,12 +101,14 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                 children: List.generate(
                   eventProvider.menuList.length,
                   (index) => MenuCard(
-                    menuName: bottleProvider.getBottleName(
+                    menuName: venueProvider.getMenuName(
                       eventProvider.menuList[index].id!,
                     ),
-                    price: "\$100",
+                    price:
+                        "\$${venueProvider.getMenuPrice(eventProvider.menuList[index].id!)}",
                     quantity: eventProvider.menuList[index].quantity.toString(),
-                    subtotal: "\$300",
+                    subtotal:
+                        "\$${venueProvider.getMenuPrice(eventProvider.menuList[index].id!)}",
                     onDelete: () {
                       eventProvider.removeMenu(index);
                     },
@@ -160,6 +163,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                     child: TextField(
                       onChanged: (value) {
                         eventProvider.getPromoCode(value);
+                        eventProvider.calculateTotalAmountWithPromo(value);
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -195,7 +199,9 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                         vertical: 16,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      eventProvider.addPromoValue();
+                    },
                     child: const Text('Apply'),
                   ),
                 ],
@@ -212,14 +218,6 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text('Promo', style: TextStyle(color: Colors.white)),
-                          Text('-', style: TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Subtotal',
@@ -229,6 +227,14 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                             eventProvider.getTotalPrice(),
                             style: TextStyle(color: Colors.white),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text('Promo', style: TextStyle(color: Colors.white)),
+                          Text('-', style: TextStyle(color: Colors.white)),
                         ],
                       ),
                       const SizedBox(height: 4),

@@ -11,6 +11,7 @@ import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/home_screen/home_proivder.dart';
 import 'package:mingly/src/screens/protected/profile_screen/profile_provider.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
@@ -23,6 +24,7 @@ class HomeScreen extends StatelessWidget {
     final profileProvider = context.watch<ProfileProvider>();
     final homeProvider = context.watch<HomeProivder>();
     final eventsProvider = context.watch<EventsProvider>();
+    final venueProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       floatingActionButton: Padding(
@@ -45,6 +47,7 @@ class HomeScreen extends StatelessWidget {
             await homeProvider.getHomeData();
             await profileProvider.getProfile();
             await eventsProvider.getEventList();
+            await venueProvider.getVenuesList();
           },
           child: CustomScrollView(
             slivers: [

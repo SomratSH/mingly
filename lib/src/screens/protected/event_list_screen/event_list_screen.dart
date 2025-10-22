@@ -205,7 +205,9 @@ class _EventListScreenState extends State<EventListScreen> {
                           context.push("/event-detail", extra: event);
                         },
                         date: "",
-                        image: event.images!.first.thumbnailImage!,
+                        image: event.images!.isEmpty
+                            ? ''
+                            : event.images!.first.thumbnailImage!,
                         title: event.eventName ?? "",
                         location: event.venueName ?? "",
                         country: event.currency ?? "",
@@ -266,7 +268,9 @@ class _EventCard extends StatelessWidget {
                         topRight: Radius.circular(16),
                       ),
                       child: Image.network(
-                        AppUrls.imageUrlNgrok + image,
+                        image == ""
+                            ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                            : AppUrls.imageUrlNgrok + image,
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,

@@ -212,20 +212,27 @@ class TableBookingScreen extends StatelessWidget {
                     border: Border.all(color: Colors.white24),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Image.network(
-                    '${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsModel.images!.first.seatingPlan}',
-                    height: 200,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      debugPrint("❌ Image load failed: $error");
-                      return Image.network(
-                        'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
-                        fit: BoxFit.cover,
-                        height: 160,
-                        width: double.infinity,
-                      );
-                    },
-                  ),
+                  child:
+                      eventProvider.tableTicketModel.tables!.first.image == null
+                      ? Image.network(
+                          'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                          height: 200,
+                          fit: BoxFit.contain,
+                        )
+                      : Image.network(
+                          '${AppUrls.imageUrlNgrok}${eventProvider.tableTicketModel.tables!.first.image}',
+                          height: 200,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint("❌ Image load failed: $error");
+                            return Image.network(
+                              'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                              fit: BoxFit.cover,
+                              height: 160,
+                              width: double.infinity,
+                            );
+                          },
+                        ),
                 ),
               ),
               const SizedBox(height: 16),

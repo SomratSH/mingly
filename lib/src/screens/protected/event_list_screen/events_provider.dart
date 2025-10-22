@@ -67,7 +67,9 @@ class EventsProvider extends ChangeNotifier {
       eventDetailsModel = response;
       eventDetailsImageList.clear();
       eventDetailsImageList =
-       eventDetailsModel.images == null ||   eventDetailsModel.images!.first.imageGl == null ||
+          eventDetailsModel.images == null ||
+              eventDetailsModel.images!.isEmpty ||
+              eventDetailsModel.images!.first.imageGl == null ||
               eventDetailsModel.images!.first.imageGl!.isEmpty
           ? []
           : List<String>.from(
@@ -352,6 +354,4 @@ class EventsProvider extends ChangeNotifier {
     promoValue = promoDiscount;
     notifyListeners();
   }
-
- 
 }

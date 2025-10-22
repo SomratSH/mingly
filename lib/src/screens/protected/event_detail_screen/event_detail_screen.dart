@@ -52,15 +52,9 @@ class EventDetailScreen extends StatelessWidget {
                 height: 180,
                 child: Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: PageView.builder(
-                        itemCount: eventProvider.eventDetailsImageList.length,
-                        onPageChanged: (index) {},
-
-                        itemBuilder: (context, index) {
-                          return Image.network(
-                            "${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsImageList[index]}",
+                    eventProvider.eventDetailsImageList.isEmpty
+                        ? Image.network(
+                            "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
                             height: 180,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -71,10 +65,31 @@ class EventDetailScreen extends StatelessWidget {
                                     color: Colors.grey,
                                   ),
                                 ),
-                          );
-                        },
-                      ),
-                    ),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: PageView.builder(
+                              itemCount:
+                                  eventProvider.eventDetailsImageList.length,
+                              onPageChanged: (index) {},
+
+                              itemBuilder: (context, index) {
+                                return Image.network(
+                                  "${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsImageList[index]}",
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                );
+                              },
+                            ),
+                          ),
                     // 🔹 Back arrow
                     Positioned(
                       left: 8,

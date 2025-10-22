@@ -21,7 +21,7 @@ class VenueProvider extends ChangeNotifier {
   }
 
   Future<void> getVenueMenuList(int venueId) async {
-    final response = await VenuesRepo().getVenueMenu(venueId);
+    final response = await VenuesRepo().getVenueMenu(119);
 
     if (response.isNotEmpty) {
       List<VenueMenuModel> data = response;

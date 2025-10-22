@@ -174,7 +174,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 keyboardType: TextInputType.phone,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: 'Address',
+                  labelText: 'Country',
                   labelStyle: const TextStyle(color: Color(0xFFFAE7E7)),
                   enabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(

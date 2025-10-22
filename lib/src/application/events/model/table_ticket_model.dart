@@ -50,6 +50,7 @@ class Tables {
   double? h;
   String? shape;
   List<String>? chairs;
+  String? image;
 
   Tables({
     this.id,
@@ -62,6 +63,7 @@ class Tables {
     this.h,
     this.shape,
     this.chairs,
+    this.image,
   });
 
   Tables.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,7 @@ class Tables {
     h = json['h'];
     shape = json['shape'];
     chairs = json['chairs']?.cast<String>();
+    image = json['set_image'];
   }
 
   Map<String, dynamic> toJson() {
@@ -89,6 +92,7 @@ class Tables {
     data['h'] = this.h;
     data['shape'] = this.shape;
     data['chairs'] = this.chairs;
+    data['set_image'] = this.image;
     return data;
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/api_service/firebae_google_signup.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/components/helpers.dart';
 
@@ -10,6 +12,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -66,17 +69,60 @@ class WelcomeScreen extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 12.h),
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              PrimaryButton(
-                                text: "Sign-Up",
-                                onPressed: () {
-                                  context.push("/signup");
-                                },
-                              ),
-                            ],
+                          // Existing Sign-Up button
+                          SizedBox(
+                            width: double.infinity,
+                            child: PrimaryButton(
+                              text: "Sign-Up",
+                              onPressed: () {
+                                context.push("/signup");
+                              },
+                            ),
                           ),
+
+                          SizedBox(height: 12.h),
+
+                          // New "Sign in with Google" button
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 12.h,
+                                  horizontal: 16.w,
+                                ),
+                                side: BorderSide(
+                                  color: theme.colorScheme.primary,
+                                  width: 1,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                              ),
+                              icon: SvgPicture.asset(
+                                'lib/assets/icons/google (1).svg', // make sure you add this image in your assets
+                                height: 24.h,
+                              ),
+                              label: Text(
+                                'Sign in with Google',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16.sp,
+                                ),
+                              ),
+                              onPressed: () async {
+                                final status = await FirebaseServices()
+                                    .signInWithGoogle();
+                                print("done" + status.toString());
+                                // await FirebaseServices().googleSignOut();
+                              },
+                            ),
+                          ),
+
+                          SizedBox(height: 20.h),
+
+                          // Already have account? Login
                           Center(
                             child: Row(
                               mainAxisSize: MainAxisSize.min,

@@ -1,4 +1,4 @@
-package com.example.mingly
+package com.app.mingly
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -5,6 +5,7 @@ import 'package:mingly/src/application/venues/repo/venues_repo.dart';
 
 class VenueProvider extends ChangeNotifier {
   List<VenuesModel> venuesList = [];
+  List<VenuesModel> venuesFeaturedList = [];
   List<VenueMenuModel> venueMenuList = [];
 
   Future<void> getVenuesList() async {
@@ -20,8 +21,21 @@ class VenueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getFeaturedVenuesList() async {
+    final response = await VenuesRepo().getFeaturedVenues();
+
+    if (response.isNotEmpty) {
+      List<VenuesModel> data = response;
+      venuesFeaturedList.clear();
+      for (var e in data) {
+        venuesFeaturedList.add(e);
+      }
+    }
+    notifyListeners();
+  }
+
   Future<void> getVenueMenuList(int venueId) async {
-    final response = await VenuesRepo().getVenueMenu(119);
+    final response = await VenuesRepo().getVenueMenu(2);
 
     if (response.isNotEmpty) {
       List<VenueMenuModel> data = response;

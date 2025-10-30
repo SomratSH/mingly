@@ -304,6 +304,7 @@ class BookingSummary extends StatelessWidget {
             InkWell(
               onTap: () async {
                 LoadingDialog.show(context);
+                
                 final status = await eventProvider.buyTableTicketEvent(
                   eventProvider.tableBooking.toJson(),
                   eventProvider.selectEventModel.id.toString(),

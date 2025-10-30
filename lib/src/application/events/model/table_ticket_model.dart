@@ -51,6 +51,8 @@ class Tables {
   String? shape;
   List<String>? chairs;
   String? image;
+  double? price;
+  int? tableId;
 
   Tables({
     this.id,
@@ -64,10 +66,12 @@ class Tables {
     this.shape,
     this.chairs,
     this.image,
+    this.price,
+    this.tableId,
   });
 
   Tables.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['seat_id'];
     seatStatus = json['seat_status'];
     availabilityStatus = json['availability_status'];
     tcketNumber = json['tcket_number'];
@@ -78,6 +82,8 @@ class Tables {
     shape = json['shape'];
     chairs = json['chairs']?.cast<String>();
     image = json['set_image'];
+    price = json["price"];
+    tableId = json["table_id"];
   }
 
   Map<String, dynamic> toJson() {
@@ -93,6 +99,7 @@ class Tables {
     data['shape'] = this.shape;
     data['chairs'] = this.chairs;
     data['set_image'] = this.image;
+    data["table_id"] = this.tableId;
     return data;
   }
 }

@@ -5,8 +5,8 @@ class FirebaseServices {
   final _auth = FirebaseAuth.instance;
   final _googleSignIn = GoogleSignIn();
 
-  /// Sign in with Google and return the Firebase ID Token (JWT)
-  Future<String?> signInWithGoogle() async {
+ 
+  Future<User?> signInWithGoogle() async {
     try {
       // Trigger the Google authentication flow
       final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
@@ -28,11 +28,11 @@ class FirebaseServices {
       final userCredential = await _auth.signInWithCredential(credential);
 
       // Get the Firebase ID token (JWT)
-      final idToken = await userCredential.user?.getIdToken();
+      final idToken = await userCredential.user;
       print("id toke === >  $idToken");
       return idToken;
     } catch (e) {
-      print('❌ Google Sign-In error: $e');
+      print('Google Sign-In error: $e');
       rethrow;
     }
   }

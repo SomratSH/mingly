@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
@@ -257,10 +258,11 @@ class TableBookingScreen extends StatelessWidget {
                     final isAvailable = table.availabilityStatus == "available";
 
                     return _TableSlotButton(
-                      id: table.id!,
+                      id: table.tableId!.toInt(),
                       label:
                           'Table\n${(table.tcketNumber ?? index + 1).toString().padLeft(2, '0')}',
                       available: isAvailable,
+                      table: table,
                     );
                   }),
                 ],
@@ -340,11 +342,13 @@ class _TimeSlotButton extends StatelessWidget {
 class _TableSlotButton extends StatelessWidget {
   final int id;
   final String label;
+  final Tables table;
   final bool available;
   const _TableSlotButton({
     required this.label,
     required this.available,
     required this.id,
+    required this.table,
   });
 
   @override
@@ -356,7 +360,7 @@ class _TableSlotButton extends StatelessWidget {
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: eventProvider.tableBooking.seatId == id
+          side: eventProvider.tableBooking.seatId == table.id
               ? BorderSide(color: Colors.white)
               : BorderSide(color: Colors.transparent),
         ),
@@ -370,7 +374,8 @@ class _TableSlotButton extends StatelessWidget {
             backgroundColor: Colors.red,
           );
         } else if (available) {
-          eventProvider.selecteTableBooking(id, "17:00");
+          eventProvider.selecteTableBooking(table.tableId!, "17:00", table.id!);
+          eventProvider.selectedTable(table);
         }
       },
       child: Text(

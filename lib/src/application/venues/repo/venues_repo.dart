@@ -14,6 +14,15 @@ class VenuesRepo {
     return response.map((e) => VenuesModel.fromJson(e)).toList();
   }
 
+   Future<List<VenuesModel>> getFeaturedVenues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await ApiService().getList(
+      AppUrls.venuesUrl + "?featured=true",
+      authToken: prefs.getString("authToken") ?? "",
+    );
+    return response.map((e) => VenuesModel.fromJson(e)).toList();
+  }
+
   Future<List<VenueMenuModel>> getVenueMenu(int venueId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await ApiService().getList(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/authentication/authentiation_repo/authentication_repo.dart';
@@ -81,6 +82,7 @@ class AuthProvider extends ChangeNotifier {
     if (response["message"] != null) {
       prefs.setString('authToken', response["access_token"]);
       prefs.setString('refreshToken', response["refresh_token"].toString());
+      prefs.setBool("isGoogleLogin", false);
       emailController.clear();
       passwordController.clear();
       notifyListeners();
@@ -121,6 +123,31 @@ class AuthProvider extends ChangeNotifier {
     });
     emailController.clear();
     passwordController.clear();
+    isLoading = false;
+    notifyListeners();
+    return response;
+  }
+
+  Future<Map<String, dynamic>> signUpGoogle(User status) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isLoading = true;
+    notifyListeners();
+    final response = await AuthenticationRepo(ApiService()).loginGoogle({
+      "email": status.email!,
+      "mobile": status.phoneNumber!,
+      "full_name": status.displayName!,
+      "avatar": status.photoURL!,
+    });
+    if (response["message"] != null) {
+      prefs.setString('authToken', response["access_token"]);
+      prefs.setString('refreshToken', response["refresh_token"].toString());
+      prefs.setBool("isGoogleLogin", true);
+      emailController.clear();
+      passwordController.clear();
+      notifyListeners();
+    } else {
+      debugPrint("Login failed: ${response["message"]}");
+    }
     isLoading = false;
     notifyListeners();
     return response;

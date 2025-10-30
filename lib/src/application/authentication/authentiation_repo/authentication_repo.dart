@@ -19,6 +19,15 @@ class AuthenticationRepo {
     return response;
   }
 
+  Future<Map<String, dynamic>> loginGoogle(Map<String, String> map) async {
+    final response = await _apiService.postDataRegular(
+      AppUrls.loginGoogle,
+      map,
+    );
+    debugPrint("Response from login: $response");
+    return response;
+  }
+
   //forgot password
   Future<Map<String, dynamic>> forgotPassword(Map<String, String> body) async {
     final response = await _apiService.postDataRegular(

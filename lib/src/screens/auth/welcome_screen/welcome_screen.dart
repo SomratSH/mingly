@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:mingly/src/api_service/firebae_google_signup.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/components/helpers.dart';
+import 'package:provider/provider.dart';
+import 'package:mingly/src/screens/auth/auth_provider.dart' as Top;
+
+import '../../../components/custom_snackbar.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -12,7 +17,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    final provider = context.watch<Top.AuthProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -114,6 +119,31 @@ class WelcomeScreen extends StatelessWidget {
                               onPressed: () async {
                                 final status = await FirebaseServices()
                                     .signInWithGoogle();
+                                if (status != null) {
+                                  final data = await provider.signUpGoogle(
+                                    status,
+                                  );
+                                  if (data['message'] != null) {
+                                    CustomSnackbar.show(
+                                      context,
+                                      message: data["message"],
+                                      textColor: Colors.white,
+                                      backgroundColor: Colors.green,
+                                    );
+                                    context.push("/home");
+                                  } else if (data["error"] != null) {
+                                    CustomSnackbar.show(
+                                      context,
+                                      message: data["error"],
+                                      backgroundColor: Colors.red,
+                                    );
+                                  }
+                                } else {
+                                  CustomSnackbar.show(
+                                    context,
+                                    message: "Somthing wrong, try again.",
+                                  );
+                                }
                                 print("done" + status.toString());
                                 // await FirebaseServices().googleSignOut();
                               },

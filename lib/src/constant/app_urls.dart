@@ -5,6 +5,7 @@ class AppUrls {
   static String imageUrlNgrok = "http://10.10.13.11:8000";
   //authentication
   static String login = "/auth/login/";
+  static String loginGoogle = "/google/login/";
   static String signUp = "/auth/signup/";
   static String verifyOtp = "/auth/verify-otp/";
   static String forgotPassword = "/auth/forget-password/";
@@ -57,4 +58,6 @@ class AppUrls {
   static String getRecomendedEvent = "/recommended-events/";
 
   static String promoCodeUrl = "/get-promocodes/";
+
+  static String getAdsImage = "/featured-images/";
 }

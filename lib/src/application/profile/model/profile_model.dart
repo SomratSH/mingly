@@ -31,6 +31,8 @@ class Data {
   int? currentPoints;
   int? targetPoints;
   double? progress;
+  String  ? referralCode ;
+  
 
   Data(
       {this.fullName,
@@ -57,6 +59,7 @@ class Data {
     currentPoints = json['current_points'];
     targetPoints = json['target_points'];
     progress = json['progress'];
+    referralCode = json["referral_code"];
   }
 
   Map<String, dynamic> toJson() {

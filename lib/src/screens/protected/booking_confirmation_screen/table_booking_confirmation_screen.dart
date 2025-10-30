@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart';
+import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/menu_card.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/table_card.dart';
+import 'package:mingly/src/screens/protected/booking_summary/widget/custom_confirm_dialog.dart'
+    show showCustomConfirmDialogEventTicket;
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/my_bottles/bottle_provider.dart';
+import 'package:mingly/src/screens/protected/payment/payment_stripe_table.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -139,10 +144,13 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                       eventProvider.tableBooking.seatId!,
                     ) ??
                     [],
-                downPayment: "IDR 250,000",
-                minimumCharge: "IDR 230,000",
+                downPayment:
+                    "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs!.length.toString())}",
+                minimumCharge:
+                    "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
                 tableCount: "1",
-                totalDownPayment: "IDR 250,000",
+                totalDownPayment:
+                    "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
                 onDelete: () {
                   print("Deleted");
                 },
@@ -224,7 +232,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            eventProvider.getTotalPrice(),
+                            "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -232,9 +240,12 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text('Promo', style: TextStyle(color: Colors.white)),
-                          Text('-', style: TextStyle(color: Colors.white)),
+                          Text(
+                            eventProvider.promoValue.toString(),
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -246,7 +257,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            eventProvider.getTotalPrice(),
+                            "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -255,25 +266,37 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Full Payment', style: TextStyle(color: Colors.black)),
-                    Text(
-                      eventProvider.getTotalPrice(),
-                      style: TextStyle(color: Colors.black),
+              Row(
+                children: [
+                  // FIRST CHILD
+                  Row(
+                    children: [
+                      const Text('Down payment'),
+                      const SizedBox(width: 8),
+                      Transform.scale(
+                        scale: 0.6,
+                        child: Switch.adaptive(
+                          value: eventProvider.isDownPayment,
+                          onChanged: (v) => eventProvider.toggleDownPayment(v),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  Text(
+                    eventProvider.isDownPayment ? 'Will apply' : 'Not applied',
+                    style: TextStyle(
+                      color: eventProvider.isDownPayment
+                          ? Colors.green
+                          : Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -285,12 +308,43 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                     ),
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
-                    context.push("/booking-summary");
+                  onPressed: () async {
+                    LoadingDialog.show(context);
+                  
+                    final status = await eventProvider.buyTableTicketEvent(
+                      eventProvider.tableBooking.toJson(),
+                      eventProvider.selectEventModel.id.toString(),
+                    );
+                    LoadingDialog.hide(context);
+
+                    if (status["success"] == true &&
+                        status["checkout_url"] != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StripePaymentWebViewTable(
+                            url: status["checkout_url"],
+                          ),
+                        ),
+                      ).then((e) {
+                        showCustomConfirmDialogEventTicket(
+                          context,
+                          eventProvider.selectedTickets.length.toString(),
+                          "table booking successfully",
+                        );
+                      });
+                    } else {
+                      CustomSnackbar.show(
+                        context,
+                        message: "Getting some error",
+                        backgroundColor: Colors.red,
+                      );
+                    }
                   },
                   child: const Text('Proceed'),
                 ),
               ),
+              SizedBox(height: 10),
             ],
           ),
         ),

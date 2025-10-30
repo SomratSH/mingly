@@ -48,6 +48,7 @@ class HomeScreen extends StatelessWidget {
             await profileProvider.getProfile();
             await eventsProvider.getEventList();
             await venueProvider.getVenuesList();
+            await venueProvider.getFeaturedVenuesList();
           },
           child: CustomScrollView(
             slivers: [
@@ -172,7 +173,7 @@ class HomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             image: DecorationImage(
                               image: NetworkImage(
-                                homeProvider.addImageList[index],
+                                AppUrls.imageUrlNgrok + homeProvider.addImageList[index].imageUrl.toString(),
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -199,7 +200,13 @@ class HomeScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                'XUYB895EW',
+                                profileProvider.profileModel.data == null
+                                    ? "N/A"
+                                    : profileProvider
+                                              .profileModel
+                                              .data!
+                                              .referralCode ??
+                                          "N/A",
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -258,7 +265,7 @@ class HomeScreen extends StatelessWidget {
                           _MenuIcon(
                             onTap: () => context.push('/my-bottles'),
                             svgAsset: 'lib/assets/icons/bottle.svg',
-                            label: 'My Bottles',
+                            label: 'My Menu',
                           ),
                         ],
                       ),
@@ -266,23 +273,50 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     // Featured Venues
                     _SectionHeader(title: 'Featured Venues'),
-                    InkWell(
-                      onTap: () => context.push('/venue-detail'),
-                      child: _VenueCard(
-                        image: 'lib/assets/images/dummy_calavie.png',
-                        title: 'Celavie',
-                        location:
-                            'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => context.push('/venue-detail'),
-                      child: _VenueCard(
-                        image: 'lib/assets/images/dummy_muin.png',
-                        title: 'Muin',
-                        location: 'Tan Nuea, Watthana, Bangkok',
-                      ),
-                    ),
+
+                    venueProvider.venuesFeaturedList.isEmpty
+                        ? SizedBox()
+                        : Column(
+                            children: List.generate(
+                              venueProvider.venuesFeaturedList.length,
+                              (index) => InkWell(
+                                onTap: () async {
+                                  LoadingDialog.show(context);
+                                  venueProvider.selectedVenue(
+                                    venueProvider.venuesFeaturedList[index].id,
+                                  );
+                                  await eventsProvider.getEvetListVuneWise(
+                                    venueProvider.venuesFeaturedList[index].id!
+                                        .toInt(),
+                                  );
+                                  await venueProvider.getVenueMenuList(
+                                    venueProvider.venuesFeaturedList[index].id!
+                                        .toInt(),
+                                  );
+                                  LoadingDialog.hide(context);
+                                  context.push("/venue-detail");
+                                },
+                                child: _VenueCard(
+                                  image:
+                                      venueProvider
+                                              .venuesFeaturedList[index]
+                                              .images!
+                                              .isEmpty ||
+                                          venueProvider
+                                                  .venuesFeaturedList[index]
+                                                  .images!
+                                                  .first
+                                                  .imageUrl ==
+                                              null
+                                      ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                                      : "${AppUrls.imageUrlNgrok}${venueProvider.venuesFeaturedList[index].images!.first.imageUrl!}",
+                                  title: 'Celavie',
+                                  location:
+                                      'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
+                                ),
+                              ),
+                            ),
+                          ),
                     SizedBox(height: 12.h),
                     // Popular Events
                     _SectionHeader(title: 'Popular Events'),
@@ -447,7 +481,7 @@ class _VenueCard extends StatelessWidget {
                 height: 90.h,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(image, fit: BoxFit.cover),
+                  child: Image.network(image, fit: BoxFit.cover),
                 ),
               ),
               SizedBox(width: 16),
@@ -486,166 +520,180 @@ class _EventCard extends StatelessWidget {
     final eventProvider = context.watch<EventsProvider>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Column(
-        children: List.generate(
-          eventProvider.popularEventModel.topPopularEvents!.length,
-          (index) {
-            return InkWell(
-              onTap: () async {
-                LoadingDialog.show(context);
-                // eventProvider.selectEventModelFunction(event);
-                await eventProvider.getEventsDetailsData(
-                  eventProvider.popularEventModel.topPopularEvents![index].id
-                      .toString(),
-                );
-                LoadingDialog.hide(context);
-                context.push(
-                  "/event-detail",
-                  extra: eventProvider.eventsList[index],
-                );
-              },
-              child: Card(
-                color: Theme.of(context).colorScheme.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.r)),
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(
-                        height: 140,
-                        child:
-                            eventProvider
-                                    .popularEventModel
-                                    .topPopularEvents![index]
-                                    .picture ==
-                                null
-                            ? Image.network(
-                                "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
-                                fit: BoxFit.cover,
-                              )
-                            : Image.network(
-                                AppUrls.imageUrl +
+      child: eventProvider.popularEventModel.topPopularEvents == null
+          ? SizedBox()
+          : Column(
+              children: List.generate(
+                eventProvider.popularEventModel.topPopularEvents!.length,
+                (index) {
+                  return InkWell(
+                    onTap: () async {
+                      LoadingDialog.show(context);
+                      // eventProvider.selectEventModelFunction(event);
+                      await eventProvider.getEventsDetailsData(
+                        eventProvider
+                            .popularEventModel
+                            .topPopularEvents![index]
+                            .id
+                            .toString(),
+                      );
+                      LoadingDialog.hide(context);
+                      context.push(
+                        "/event-detail",
+                        extra: eventProvider.eventsList[index],
+                      );
+                    },
+                    child: Card(
+                      color: Theme.of(context).colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12.r)),
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: 140,
+                              child:
+                                  eventProvider
+                                          .popularEventModel
+                                          .topPopularEvents![index]
+                                          .picture ==
+                                      null
+                                  ? Image.network(
+                                      "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      AppUrls.imageUrl +
+                                          eventProvider
+                                              .popularEventModel
+                                              .topPopularEvents![index]
+                                              .picture
+                                              .toString(),
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     eventProvider
                                         .popularEventModel
                                         .topPopularEvents![index]
-                                        .picture
+                                        .eventName
                                         .toString(),
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              eventProvider
-                                  .popularEventModel
-                                  .topPopularEvents![index]
-                                  .eventName
-                                  .toString(),
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15.sp,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'THU 26 May, 09:00 - FRI 27 May, 10:00',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 30,
-                                  child: AnimatedAvatarStack(
-                                    height: 30.w,
-                                    infoWidgetBuilder: (surplus, context) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(
-                                            50.r,
-                                          ),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.sp,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'THU 26 May, 09:00 - FRI 27 May, 10:00',
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 30,
+                                        child: AnimatedAvatarStack(
+                                          height: 30.w,
+                                          infoWidgetBuilder:
+                                              (surplus, context) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          50.r,
+                                                        ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      surplus > 0
+                                                          ? '+$surplus'
+                                                          : '',
+                                                      style: TextStyle(
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.onPrimary,
+                                                        fontSize: 12.sp,
+                                                        height: 1,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                          avatars: [
+                                            for (var n = 0; n < 10; n++)
+                                              NetworkImage(
+                                                'https://i.pravatar.cc/150?img=$n',
+                                              ),
+                                          ],
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            surplus > 0 ? '+$surplus' : '',
-                                            style: TextStyle(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.onPrimary,
-                                              fontSize: 12.sp,
-                                              height: 1,
+                                      ),
+                                      Expanded(
+                                        flex: 30,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                                  .withAlpha(
+                                                    (255 * 0.1).toInt(),
+                                                  ),
+                                              borderRadius:
+                                                  BorderRadius.circular(4.r),
+                                            ),
+                                            child: Text(
+                                              'Free',
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                                fontSize: 12.sp,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                    avatars: [
-                                      for (var n = 0; n < 10; n++)
-                                        NetworkImage(
-                                          'https://i.pravatar.cc/150?img=$n',
-                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 30,
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withAlpha((255 * 0.1).toInt()),
-                                        borderRadius: BorderRadius.circular(
-                                          4.r,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Free',
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          fontSize: 12.sp,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }
@@ -663,58 +711,61 @@ class _Leaderboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                flex: 1,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    children: [
-                      Text(
-                        '2',
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withAlpha(128),
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 36.h,
-                        backgroundColor: Colors.grey.shade800,
-                        child: ClipOval(
-                          child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[1].image
-                                    .toString(),
-                            errorBuilder: (context, error, stackTrace) =>
-                                Image.network(
-                                  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-                                  fit: BoxFit.cover,
+              homeProivder.leaderBoardList.isEmpty
+                  ? SizedBox()
+                  : Expanded(
+                      flex: 1,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          children: [
+                            Text(
+                              '2',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withAlpha(128),
+                              ),
+                            ),
+                            CircleAvatar(
+                              radius: 36.h,
+                              backgroundColor: Colors.grey.shade800,
+                              child: ClipOval(
+                                child: Image.network(
+                                  AppUrls.imageUrl +
+                                      homeProivder.leaderBoardList[1].image
+                                          .toString(),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.network(
+                                        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                                        fit: BoxFit.cover,
+                                      ),
                                 ),
-                          ),
+                              ),
+                            ),
+                            Text(
+                              homeProivder.leaderBoardList[1].fullName
+                                  .toString(),
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withAlpha(182),
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                            Text(
+                              homeProivder.leaderBoardList[1].points.toString(),
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withAlpha(136),
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        homeProivder.leaderBoardList[1].fullName.toString(),
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withAlpha(182),
-                          fontSize: 13.sp,
-                        ),
-                      ),
-                      Text(
-                        homeProivder.leaderBoardList[1].points.toString(),
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withAlpha(136),
-                          fontSize: 11.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
               Expanded(
                 flex: 1,
                 child: Align(
@@ -734,9 +785,13 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[0].image
-                                    .toString(),
+                            (homeProivder.leaderBoardList.isNotEmpty &&
+                                    homeProivder.leaderBoardList[0].image !=
+                                        null)
+                                ? AppUrls.imageUrl +
+                                      homeProivder.leaderBoardList[0].image!
+                                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                            fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 Image.network(
                                   'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
@@ -745,8 +800,13 @@ class _Leaderboard extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       Text(
-                        homeProivder.leaderBoardList[0].fullName.toString(),
+                        homeProivder.leaderBoardList.isEmpty ||
+                                homeProivder.leaderBoardList[0].fullName == null
+                            ? "N/A"
+                            : homeProivder.leaderBoardList[0].fullName
+                                  .toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -755,7 +815,9 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        homeProivder.leaderBoardList[0].points.toString(),
+                        homeProivder.leaderBoardList.isEmpty
+                            ? " N/A"
+                            : homeProivder.leaderBoardList[0].points.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -782,13 +844,17 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       CircleAvatar(
-                        radius: 30.h,
+                        radius: 40.h,
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[2].image
-                                    .toString(),
+                            (homeProivder.leaderBoardList.isNotEmpty &&
+                                    homeProivder.leaderBoardList[2].image !=
+                                        null)
+                                ? AppUrls.imageUrl +
+                                      homeProivder.leaderBoardList[2].image!
+                                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                            fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 Image.network(
                                   'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
@@ -798,7 +864,10 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        homeProivder.leaderBoardList[2].fullName.toString(),
+                        homeProivder.leaderBoardList.isEmpty
+                            ? "N/A"
+                            : homeProivder.leaderBoardList[2].fullName
+                                  .toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -807,7 +876,9 @@ class _Leaderboard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        homeProivder.leaderBoardList[2].points.toString(),
+                        homeProivder.leaderBoardList.isEmpty
+                            ? "N/A"
+                            : homeProivder.leaderBoardList[2].points.toString(),
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -918,166 +989,182 @@ class _RecommendationCard extends StatelessWidget {
     final eventProvider = context.watch<EventsProvider>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Column(
-        children: List.generate(
-          eventProvider.recomendedEventModel.recommended!.length,
-          (index) {
-            return InkWell(
-              onTap: () async {
-                LoadingDialog.show(context);
-                // eventProvider.selectEventModelFunction(event);
-                await eventProvider.getEventsDetailsData(
-                  eventProvider.recomendedEventModel.recommended![index].id
-                      .toString(),
-                );
-                LoadingDialog.hide(context);
-                context.push(
-                  "/event-detail",
-                  extra: eventProvider.eventsList[index],
-                );
-              },
-              child: Card(
-                color: Theme.of(context).colorScheme.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.r)),
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(
-                        height: 140,
-                        child:
-                            eventProvider
-                                    .recomendedEventModel
-                                    .recommended![index]
-                                    .picture ==
-                                null
-                            ? Image.network(
-                                "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
-                                fit: BoxFit.cover,
-                              )
-                            : Image.network(
-                                AppUrls.imageUrl +
+      child:
+          eventProvider.recomendedEventModel.recommended == null ||
+              eventProvider.recomendedEventModel.recommended!.isEmpty
+          ? SizedBox()
+          : Column(
+              children: List.generate(
+                eventProvider.recomendedEventModel.recommended!.length,
+                (index) {
+                  return InkWell(
+                    onTap: () async {
+                      LoadingDialog.show(context);
+                      // eventProvider.selectEventModelFunction(event);
+                      await eventProvider.getEventsDetailsData(
+                        eventProvider
+                            .recomendedEventModel
+                            .recommended![index]
+                            .id
+                            .toString(),
+                      );
+                      LoadingDialog.hide(context);
+                      context.push(
+                        "/event-detail",
+                        extra: eventProvider.eventsList[index],
+                      );
+                    },
+                    child: Card(
+                      color: Theme.of(context).colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12.r)),
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: 140,
+                              child:
+                                  eventProvider
+                                          .recomendedEventModel
+                                          .recommended![index]
+                                          .picture ==
+                                      null
+                                  ? Image.network(
+                                      "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      AppUrls.imageUrl +
+                                          eventProvider
+                                              .recomendedEventModel
+                                              .recommended![index]
+                                              .picture
+                                              .toString(),
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     eventProvider
                                         .recomendedEventModel
                                         .recommended![index]
-                                        .picture
+                                        .eventName
                                         .toString(),
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              eventProvider
-                                  .recomendedEventModel
-                                  .recommended![index]
-                                  .eventName
-                                  .toString(),
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15.sp,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'THU 26 May, 09:00 - FRI 27 May, 10:00',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 30,
-                                  child: AnimatedAvatarStack(
-                                    height: 30.w,
-                                    infoWidgetBuilder: (surplus, context) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(
-                                            50.r,
-                                          ),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15.sp,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'THU 26 May, 09:00 - FRI 27 May, 10:00',
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 30,
+                                        child: AnimatedAvatarStack(
+                                          height: 30.w,
+                                          infoWidgetBuilder:
+                                              (surplus, context) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          50.r,
+                                                        ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      surplus > 0
+                                                          ? '+$surplus'
+                                                          : '',
+                                                      style: TextStyle(
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.onPrimary,
+                                                        fontSize: 12.sp,
+                                                        height: 1,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                          avatars: [
+                                            for (var n = 0; n < 10; n++)
+                                              NetworkImage(
+                                                'https://i.pravatar.cc/150?img=$n',
+                                              ),
+                                          ],
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            surplus > 0 ? '+$surplus' : '',
-                                            style: TextStyle(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.onPrimary,
-                                              fontSize: 12.sp,
-                                              height: 1,
+                                      ),
+                                      Expanded(
+                                        flex: 30,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                                  .withAlpha(
+                                                    (255 * 0.1).toInt(),
+                                                  ),
+                                              borderRadius:
+                                                  BorderRadius.circular(4.r),
+                                            ),
+                                            child: Text(
+                                              'Free',
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                                fontSize: 12.sp,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                    avatars: [
-                                      for (var n = 0; n < 10; n++)
-                                        NetworkImage(
-                                          'https://i.pravatar.cc/150?img=$n',
-                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 30,
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withAlpha((255 * 0.1).toInt()),
-                                        borderRadius: BorderRadius.circular(
-                                          4.r,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Free',
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          fontSize: 12.sp,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }

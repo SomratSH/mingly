@@ -246,6 +246,13 @@ class EventsProvider extends ChangeNotifier {
     return [];
   }
 
+  Tables selecteTable = Tables();
+  void selectedTable(Tables data) {
+    selecteTable = Tables();
+    selecteTable = data;
+    notifyListeners();
+  }
+
   String? selectedCategory;
   final List<String> categories = [
     'Coffee',
@@ -262,9 +269,15 @@ class EventsProvider extends ChangeNotifier {
 
   TableBooking tableBooking = TableBooking();
 
-  void selecteTableBooking(int tableid, String selectedTime) {
+  void selecteTableBooking(int tableid, String selectedTime, int seatId) {
     tableBooking = TableBooking();
-    tableBooking = TableBooking(seatId: tableid, selectedTime: selectedTime);
+    tableBooking = TableBooking(
+      seatId: seatId,
+      tableId: tableid,
+      selectedTime: selectedTime,
+      paymentType: _isDownPayment ? "full" : "down",
+      menu: menuList,
+    );
     notifyListeners();
   }
 
@@ -282,10 +295,13 @@ class EventsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
+
   Future<Map<String, dynamic>> buyTableTicketEvent(
     Map<String, dynamic> data,
     id,
   ) async {
+    print(data);
     final response = await EventsRepo().buyTableEventTicket(data, id);
     return response;
   }
@@ -350,8 +366,18 @@ class EventsProvider extends ChangeNotifier {
   }
 
   double promoValue = 0.0;
+
   void addPromoValue() {
     promoValue = promoDiscount;
+    notifyListeners();
+  }
+
+  bool _isDownPayment = false;
+
+  bool get isDownPayment => _isDownPayment;
+
+  void toggleDownPayment(bool value) {
+    _isDownPayment = value;
     notifyListeners();
   }
 }

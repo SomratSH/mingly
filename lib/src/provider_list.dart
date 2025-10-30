@@ -10,7 +10,11 @@ import 'package:provider/single_child_widget.dart';
 class ProviderList {
   static List<SingleChildWidget> get providers => [
     ChangeNotifierProvider(create: (_) => AuthProvider()),
-    ChangeNotifierProvider(create: (_) => VenueProvider()..getVenuesList()),
+    ChangeNotifierProvider(
+      create: (_) => VenueProvider()
+        ..getVenuesList()
+        ..getFeaturedVenuesList(),
+    ),
     ChangeNotifierProvider(
       create: (_) => EventsProvider()
         ..getEventList()
@@ -30,6 +34,7 @@ class ProviderList {
       create: (_) => HomeProivder()
         ..getCurrentLocationName()
         ..getLeaderBoardlist()
+        ..getAdsImagelist()
         ..getPackagelist(),
     ),
   ];

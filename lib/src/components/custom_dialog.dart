@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/api_service/firebae_google_signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> showLogoutDialog(BuildContext context) {
@@ -51,7 +52,13 @@ Future<void> showLogoutDialog(BuildContext context) {
                 onTap: () async {
                   SharedPreferences preferences =
                       await SharedPreferences.getInstance();
-                  preferences.remove("authToken");
+
+                  if (preferences.getBool("isGoogleLogin")!) {
+                    preferences.remove("authToken");
+                    await FirebaseServices().googleSignOut();
+                  } else {
+                    preferences.remove("authToken");
+                  }
                   context.go("/login");
                 },
                 child: Container(

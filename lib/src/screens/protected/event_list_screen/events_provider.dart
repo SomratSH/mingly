@@ -221,6 +221,7 @@ class EventsProvider extends ChangeNotifier {
   //event table ticket list
   TableTicketModel tableTicketModel = TableTicketModel();
   Future<bool> getTableTicketList(String date, String time) async {
+
     final response = await EventsRepo().getTableTicket(
       selectEventModel.id.toString(),
       date,
@@ -234,7 +235,7 @@ class EventsProvider extends ChangeNotifier {
     return false;
   }
 
-  List<String> getChair(int id) {
+  List<String> getChair(int?id) {
     for (var e in tableTicketModel.tables!) {
       if (e.id == id) {
         if (e.chairs == null || e.chairs!.isEmpty) {

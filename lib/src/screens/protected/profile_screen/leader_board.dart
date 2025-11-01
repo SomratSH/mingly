@@ -86,8 +86,8 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[1].image
+                            AppUrls.imageUrlNgrok +
+                                homeProivder.leaderBoardList[1].avatar
                                     .toString(),
                             errorBuilder: (context, error, stackTrace) =>
                                 Image.network(
@@ -138,8 +138,8 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[0].image
+                            AppUrls.imageUrlNgrok +
+                                homeProivder.leaderBoardList[0].avatar
                                     .toString(),
                             errorBuilder: (context, error, stackTrace) =>
                                 Image.network(
@@ -190,8 +190,8 @@ class _Leaderboard extends StatelessWidget {
                         backgroundColor: Colors.grey.shade800,
                         child: ClipOval(
                           child: Image.network(
-                            AppUrls.imageUrl +
-                                homeProivder.leaderBoardList[2].image
+                            AppUrls.imageUrlNgrok +
+                                homeProivder.leaderBoardList[2].avatar
                                     .toString(),
                             errorBuilder: (context, error, stackTrace) =>
                                 Image.network(
@@ -257,8 +257,8 @@ class _Leaderboard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: Image.network(
-                          AppUrls.imageUrl +
-                              homeProivder.leaderBoardList[index].image
+                          AppUrls.imageUrlNgrok +
+                              homeProivder.leaderBoardList[index].avatar
                                   .toString(),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>

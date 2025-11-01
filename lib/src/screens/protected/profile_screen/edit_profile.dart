@@ -92,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ? FileImage(_imageFile!)
                       : (profileProvider.profileModel.data!.avatar != null
                                 ? NetworkImage(
-                                    AppUrls.imageUrl +
+                                    AppUrls.imageUrlNgrok +
                                         profileProvider
                                             .profileModel
                                             .data!

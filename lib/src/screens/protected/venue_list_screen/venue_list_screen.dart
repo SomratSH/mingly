@@ -251,7 +251,7 @@ class _VenueListScreenState extends State<VenueListScreen> {
                                 venue.images!.isEmpty ||
                                     venue.images!.first.imageUrl == null
                                 ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                                : "${AppUrls.imageUrlNgrok}${venue.images!.first.imageUrl!}",
+                                : "${AppUrls.imageUrl}${venue.images!.first.imageUrl!}",
                             title: venue.name ?? '',
                             location: venue.address ?? '',
                             time: venue.openingHours!.isEmpty

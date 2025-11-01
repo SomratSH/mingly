@@ -88,10 +88,11 @@ class _Layout extends StatelessWidget {
                                       .toString(),
                                   location: provider.reservationList[index].city
                                       .toString(),
-                                  imagePath: provider
-                                      .reservationList[index]
-                                      .eventPicture
-                                      .toString(),
+                                  imagePath:
+                                      provider
+                                          .reservationList[index]
+                                          .eventPicture ??
+                                      "",
                                   date: "Aug 25, 2025",
                                   status: provider.reservationList[index].status
                                       .toString(),
@@ -140,12 +141,19 @@ class _ReservationCard extends StatelessWidget {
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
               ),
-              child: Image.network(
-                "${AppUrls.imageUrl}${imagePath}",
-                width: 90,
-                height: 90,
-                fit: BoxFit.cover,
-              ),
+              child: imagePath == ""
+                  ? Image.network(
+                      "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(
+                      "${AppUrls.imageUrl}${imagePath}",
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Expanded(
               child: Padding(

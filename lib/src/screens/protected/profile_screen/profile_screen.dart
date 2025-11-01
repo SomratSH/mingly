@@ -49,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
                               profileProvider.profileModel.data!.avatar == null
                               ? const AssetImage("lib/assets/images/pp.png")
                               : NetworkImage(
-                                      AppUrls.imageUrl +
+                                      AppUrls.imageUrlNgrok +
                                           profileProvider
                                               .profileModel
                                               .data!

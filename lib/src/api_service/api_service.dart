@@ -37,7 +37,7 @@ class ApiService {
 
       // Make the POST request using http.post
       final response = await http.post(uri, headers: headers, body: body);
-
+      print("Post Api Regular ${response.body}");
       // Handle the response based on the status code or other logic
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Successfully received a response, parse the response body
@@ -147,7 +147,7 @@ class ApiService {
       final response = await request.send();
 
       final responseBody = await http.Response.fromStream(response);
-
+      print("Data reposen : ${responseBody.body}");
       // Return the parsed response
       return _handleResponse(responseBody);
     } on http.ClientException catch (e) {
@@ -223,7 +223,7 @@ class ApiService {
         Uri.parse('${AppUrls.baseUrl}$endpoint'),
         headers: headers,
       );
-
+      print("Regular Get Data ${response.body}");
       return _handleResponse(response);
     } on http.ClientException catch (e) {
       return _handleError('Network error: ${e.message}');

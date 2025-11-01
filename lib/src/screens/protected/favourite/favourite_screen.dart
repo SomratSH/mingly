@@ -60,7 +60,7 @@ class _Layout extends StatelessWidget {
                             title: fav.eventName.toString(),
                             location:
                                 "${fav.address.toString()}, ${fav.city.toString()}, ${fav.state.toString()}, ${fav.country.toString()}",
-                            imagePath: fav.eventPicture.toString(),
+                            imagePath: fav.eventPicture ?? "",
                             iconPath: "lib/assets/icons/mdi_heart.svg",
                           ),
                         );
@@ -105,12 +105,19 @@ class FavouriteCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  "${AppUrls.imageUrl}${imagePath}",
-                  fit: BoxFit.cover,
-                  height: 100,
-                  width: 100,
-                ),
+                child: imagePath == ""
+                    ? Image.network(
+                        "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        "${AppUrls.imageUrl}${imagePath}",
+                        fit: BoxFit.cover,
+                        height: 100,
+                        width: 100,
+                      ),
               ),
             ),
 

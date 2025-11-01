@@ -29,12 +29,12 @@ class Recommendations {
   String? about;
   String? description;
   String? currency;
-  String? picture;
+  Null? picture;
   int? totalBookings;
-  String? createdAt;
-  String? updatedAt;
+  List<Images>? images;
   String? venueName;
   String? venueCity;
+  int? venueCapacity;
 
   Recommendations({
     this.id,
@@ -44,10 +44,10 @@ class Recommendations {
     this.currency,
     this.picture,
     this.totalBookings,
-    this.createdAt,
-    this.updatedAt,
+    this.images,
     this.venueName,
     this.venueCity,
+    this.venueCapacity,
   });
 
   Recommendations.fromJson(Map<String, dynamic> json) {
@@ -58,10 +58,15 @@ class Recommendations {
     currency = json['currency'];
     picture = json['picture'];
     totalBookings = json['total_bookings'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    if (json['images'] != null) {
+      images = <Images>[];
+      json['images'].forEach((v) {
+        images!.add(new Images.fromJson(v));
+      });
+    }
     venueName = json['venue_name'];
     venueCity = json['venue_city'];
+    venueCapacity = json['venue_capacity'];
   }
 
   Map<String, dynamic> toJson() {
@@ -73,10 +78,46 @@ class Recommendations {
     data['currency'] = this.currency;
     data['picture'] = this.picture;
     data['total_bookings'] = this.totalBookings;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+    if (this.images != null) {
+      data['images'] = this.images!.map((v) => v.toJson()).toList();
+    }
     data['venue_name'] = this.venueName;
     data['venue_city'] = this.venueCity;
+    data['venue_capacity'] = this.venueCapacity;
+    return data;
+  }
+}
+
+class Images {
+  int? id;
+  String? thumbnailImage;
+  String? bgImage;
+  String? imageGl;
+  String? seatingPlan;
+
+  Images({
+    this.id,
+    this.thumbnailImage,
+    this.bgImage,
+    this.imageGl,
+    this.seatingPlan,
+  });
+
+  Images.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    thumbnailImage = json['thumbnail_image'];
+    bgImage = json['bg_image'];
+    imageGl = json['image_gl'];
+    seatingPlan = json['seating_plan'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['thumbnail_image'] = this.thumbnailImage;
+    data['bg_image'] = this.bgImage;
+    data['image_gl'] = this.imageGl;
+    data['seating_plan'] = this.seatingPlan;
     return data;
   }
 }

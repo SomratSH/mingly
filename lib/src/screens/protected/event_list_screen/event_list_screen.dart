@@ -240,103 +240,101 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              date,
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
-            ),
-            GestureDetector(
-              onTap: onTap,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: EdgeInsets.all(4.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                      child: Image.network(
-                        image == ""
-                            ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                            : AppUrls.imageUrlNgrok + image,
-                        height: 160,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-
-                        errorBuilder: (context, error, stackTrace) {
-                          debugPrint("❌ Image load failed: $error");
-                          return Image.network(
-                            'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
-                            fit: BoxFit.cover,
-                            height: 160,
-                            width: double.infinity,
-                          );
-                        },
-
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 160,
-                            width: double.infinity,
-                            color: Colors.grey.shade300.withOpacity(0.4),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            date,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: EdgeInsets.all(4.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
+                    child: Image.network(
+                      image == ""
+                          ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
+                          : AppUrls.imageUrl + image,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
 
-                    Padding(
-                      padding: EdgeInsets.all(4.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint("❌ Image load failed: $error");
+                        return Image.network(
+                          'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                          fit: BoxFit.cover,
+                          height: 160,
+                          width: double.infinity,
+                        );
+                      },
+
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey.shade300.withOpacity(0.4),
+                          child: const Center(
+                            child: CircularProgressIndicator(
                               color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              strokeWidth: 2,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            location,
-                            style: const TextStyle(color: Colors.white70),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            country,
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.all(4.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          location,
+                          style: const TextStyle(color: Colors.white70),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          country,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

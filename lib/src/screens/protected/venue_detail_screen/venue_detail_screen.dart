@@ -58,7 +58,7 @@ class VenueDetailScreen extends StatelessWidget {
                 child: Image.network(
                   provider.selectedVenueData.images == null
                       ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                      : "${AppUrls.imageUrlNgrok}${provider.selectedVenueData.images!.first.imageUrl}",
+                      : "${AppUrls.imageUrl}${provider.selectedVenueData.images!.first.imageUrl}",
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,

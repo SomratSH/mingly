@@ -131,13 +131,23 @@ class AuthProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> signUpGoogle(User status) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     isLoading = true;
+
     notifyListeners();
-    final response = await AuthenticationRepo(ApiService()).loginGoogle({
-      "email": status.email!,
-      "mobile": status.phoneNumber!,
-      "full_name": status.displayName!,
-      "avatar": status.photoURL!,
-    });
+    final response = await AuthenticationRepo(ApiService()).loginGoogle(
+      status.phoneNumber == null
+          ? {
+              "email": status.email!,
+              "full_name": status.displayName!,
+              "avatar": status.photoURL!,
+            }
+          : {
+              "email": status.email!,
+              "mobile": status.phoneNumber!,
+              "full_name": status.displayName!,
+              "avatar": status.photoURL!,
+            },
+    );
+    print(response);
     if (response["message"] != null) {
       prefs.setString('authToken', response["access_token"]);
       prefs.setString('refreshToken', response["refresh_token"].toString());

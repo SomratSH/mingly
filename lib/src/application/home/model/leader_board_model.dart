@@ -3,34 +3,36 @@ class LeaderBoardModel {
   String? email;
   bool? isActive;
   String? fullName;
+  String? avatar;
+  String? googleImage;
   String? membershipStatus;
   int? points;
   int? currentPoints;
-  String? image;
   int? targetPoints;
 
-  LeaderBoardModel({
-    this.id,
-    this.email,
-    this.isActive,
-    this.fullName,
-    this.membershipStatus,
-    this.points,
-    this.currentPoints,
-    this.targetPoints,
-    this.image,
-  });
+  LeaderBoardModel(
+      {this.id,
+      this.email,
+      this.isActive,
+      this.fullName,
+      this.avatar,
+      this.googleImage,
+      this.membershipStatus,
+      this.points,
+      this.currentPoints,
+      this.targetPoints});
 
   LeaderBoardModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     email = json['email'];
     isActive = json['is_active'];
     fullName = json['full_name'];
+    avatar = json['avatar'];
+    googleImage = json['google_image'];
     membershipStatus = json['membership_status'];
     points = json['points'];
     currentPoints = json['current_points'];
     targetPoints = json['target_points'];
-    image = json['avatar'];
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +41,8 @@ class LeaderBoardModel {
     data['email'] = this.email;
     data['is_active'] = this.isActive;
     data['full_name'] = this.fullName;
+    data['avatar'] = this.avatar;
+    data['google_image'] = this.googleImage;
     data['membership_status'] = this.membershipStatus;
     data['points'] = this.points;
     data['current_points'] = this.currentPoints;

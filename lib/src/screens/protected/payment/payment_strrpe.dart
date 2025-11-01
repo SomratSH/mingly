@@ -36,7 +36,7 @@ class _StripePaymentWebViewState extends State<StripePaymentWebView> {
   void _showSuccessSnackBar() {
     CustomSnackbar.show(
       context,
-      message: "Payment Successful!\nYour subscription has been activated",
+      message: "Payment Successful!\nYour ticket buy payment done",
     );
   }
 
@@ -94,8 +94,6 @@ class _StripePaymentWebViewState extends State<StripePaymentWebView> {
               Navigator.of(context).pop(false);
               return NavigationDecision.prevent;
             }
-
-          
 
             return NavigationDecision.navigate;
           },

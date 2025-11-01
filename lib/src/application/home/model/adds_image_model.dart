@@ -2,8 +2,8 @@ class AdsImage {
   int? id;
   String? title;
   String? imageUrl;
-  Null? altText;
-  Null? caption;
+  String? altText;
+  String? caption;
   int? createdBy;
   String? createdByName;
   String? createdAt;

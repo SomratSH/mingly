@@ -221,7 +221,7 @@ class TableBookingScreen extends StatelessWidget {
                           fit: BoxFit.contain,
                         )
                       : Image.network(
-                          '${AppUrls.imageUrlNgrok}${eventProvider.tableTicketModel.tables!.first.image}',
+                          '${AppUrls.imageUrl}${eventProvider.tableTicketModel.tables!.first.image}',
                           height: 200,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
@@ -374,7 +374,15 @@ class _TableSlotButton extends StatelessWidget {
             backgroundColor: Colors.red,
           );
         } else if (available) {
-          eventProvider.selecteTableBooking(table.tableId!, "17:00", table.id!);
+          List<String> parts = eventProvider
+              .tableTicketModel
+              .sessionInfo!
+              .sessionStart!
+              .split(':');
+          print("Data show" + parts.length.toString());
+          String formate = "${parts[0]}:${parts[1]}";
+
+          eventProvider.selecteTableBooking(table.tableId!, formate, table.id!);
           eventProvider.selectedTable(table);
         }
       },

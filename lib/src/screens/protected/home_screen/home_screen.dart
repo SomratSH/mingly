@@ -121,9 +121,10 @@ class HomeScreen extends StatelessWidget {
                                 }
 
                                 if (avatar != null && avatar.isNotEmpty) {
+                                  print("profile image ${avatar}");
                                   // Avatar available
                                   return Image.network(
-                                    AppUrls.imageUrl + avatar,
+                                    AppUrls.imageUrlNgrok + avatar,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: double.infinity,
@@ -173,7 +174,9 @@ class HomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             image: DecorationImage(
                               image: NetworkImage(
-                                AppUrls.imageUrlNgrok + homeProvider.addImageList[index].imageUrl.toString(),
+                                AppUrls.imageUrl +
+                                    homeProvider.addImageList[index].imageUrl
+                                        .toString(),
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -309,8 +312,10 @@ class HomeScreen extends StatelessWidget {
                                                   .imageUrl ==
                                               null
                                       ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                                      : "${AppUrls.imageUrlNgrok}${venueProvider.venuesFeaturedList[index].images!.first.imageUrl!}",
-                                  title: 'Celavie',
+                                      : "${AppUrls.imageUrl}${venueProvider.venuesFeaturedList[index].images!.first.imageUrl!}",
+                                  title: venueProvider
+                                      .venuesFeaturedList[index]
+                                      .name!,
                                   location:
                                       'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
                                 ),
@@ -351,24 +356,45 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     // Recommendations
                     _SectionHeader(title: 'Recommendations for you'),
-                    InkWell(
-                      onTap: () => context.push('/venue-detail'),
-                      child: _RecommendationCard(
-                        image: 'lib/assets/images/dummy_calavie.png',
-                        title: 'Sky High Soirée- MU;IN',
-                        location: 'New York',
-                        tag: 'Gold member',
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => context.push('/event-detail'),
-                      child: _RecommendationCard(
-                        image: 'lib/assets/images/dummy_muin.png',
-                        title: '[Waves & Raves ] - Celvaie',
-                        location: 'California',
-                        tag: 'Free',
-                      ),
-                    ),
+                    eventsProvider.recomendedEventModel.recommended == null ||
+                            eventsProvider
+                                .recomendedEventModel
+                                .recommended!
+                                .isEmpty
+                        ? SizedBox()
+                        : Column(
+                            children: List.generate(
+                              eventsProvider
+                                  .recomendedEventModel
+                                  .recommended!
+                                  .length,
+                              (index) => InkWell(
+                                onTap: () => context.push('/venue-detail'),
+                                child: _RecommendationCard(
+                                  image: eventsProvider
+                                      .recomendedEventModel
+                                      .recommended![index]
+                                      .images!
+                                      .first
+                                      .thumbnailImage
+                                      .toString(),
+                                  title: 'Sky High Soirée- MU;IN',
+                                  location: 'New York',
+                                  tag: 'Gold member',
+                                ),
+                              ),
+                            ),
+                          ),
+
+                    // InkWell(
+                    //   onTap: () => context.push('/event-detail'),
+                    //   child: _RecommendationCard(
+                    //     image: 'lib/assets/images/dummy_muin.png',
+                    //     title: '[Waves & Raves ] - Celvaie',
+                    //     location: 'California',
+                    //     tag: 'Free',
+                    //   ),
+                    // ),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -561,10 +587,10 @@ class _EventCard extends StatelessWidget {
                               height: 140,
                               child:
                                   eventProvider
-                                          .popularEventModel
-                                          .topPopularEvents![index]
-                                          .picture ==
-                                      null
+                                      .popularEventModel
+                                      .topPopularEvents![index]
+                                      .images!
+                                      .isEmpty
                                   ? Image.network(
                                       "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
                                       fit: BoxFit.cover,
@@ -574,7 +600,9 @@ class _EventCard extends StatelessWidget {
                                           eventProvider
                                               .popularEventModel
                                               .topPopularEvents![index]
-                                              .picture
+                                              .images!
+                                              .first
+                                              .thumbnailImage
                                               .toString(),
                                       fit: BoxFit.cover,
                                     ),
@@ -732,8 +760,8 @@ class _Leaderboard extends StatelessWidget {
                               backgroundColor: Colors.grey.shade800,
                               child: ClipOval(
                                 child: Image.network(
-                                  AppUrls.imageUrl +
-                                      homeProivder.leaderBoardList[1].image
+                                  AppUrls.imageUrlNgrok +
+                                      homeProivder.leaderBoardList[1].avatar
                                           .toString(),
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.network(
@@ -786,10 +814,10 @@ class _Leaderboard extends StatelessWidget {
                         child: ClipOval(
                           child: Image.network(
                             (homeProivder.leaderBoardList.isNotEmpty &&
-                                    homeProivder.leaderBoardList[0].image !=
+                                    homeProivder.leaderBoardList[0].avatar !=
                                         null)
-                                ? AppUrls.imageUrl +
-                                      homeProivder.leaderBoardList[0].image!
+                                ? AppUrls.imageUrlNgrok +
+                                      homeProivder.leaderBoardList[0].avatar!
                                 : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
@@ -849,10 +877,10 @@ class _Leaderboard extends StatelessWidget {
                         child: ClipOval(
                           child: Image.network(
                             (homeProivder.leaderBoardList.isNotEmpty &&
-                                    homeProivder.leaderBoardList[2].image !=
+                                    homeProivder.leaderBoardList[2].avatar !=
                                         null)
-                                ? AppUrls.imageUrl +
-                                      homeProivder.leaderBoardList[2].image!
+                                ? AppUrls.imageUrlNgrok +
+                                      homeProivder.leaderBoardList[2].avatar!
                                 : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
@@ -924,8 +952,8 @@ class _Leaderboard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: Image.network(
-                          AppUrls.imageUrl +
-                              homeProivder.leaderBoardList[index].image
+                          AppUrls.imageUrlNgrok +
+                              homeProivder.leaderBoardList[index].avatar
                                   .toString(),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
@@ -1032,10 +1060,10 @@ class _RecommendationCard extends StatelessWidget {
                               height: 140,
                               child:
                                   eventProvider
-                                          .recomendedEventModel
-                                          .recommended![index]
-                                          .picture ==
-                                      null
+                                      .recomendedEventModel
+                                      .recommended![index]
+                                      .images!
+                                      .isEmpty
                                   ? Image.network(
                                       "https://www.directmobilityonline.co.uk/assets/img/noimage.png",
                                       fit: BoxFit.cover,
@@ -1045,7 +1073,9 @@ class _RecommendationCard extends StatelessWidget {
                                           eventProvider
                                               .recomendedEventModel
                                               .recommended![index]
-                                              .picture
+                                              .images!
+                                              .first
+                                              .thumbnailImage
                                               .toString(),
                                       fit: BoxFit.cover,
                                     ),

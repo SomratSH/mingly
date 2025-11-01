@@ -138,6 +138,24 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
+
+              // TableCard(
+              //   no:
+              //       eventProvider.getChair(
+              //         eventProvider.tableBooking.seatId!,
+              //       ) ??
+              //       [],
+              //   downPayment:
+              //       "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs!.length == 0 ? "1" : eventProvider.selecteTable.chairs!.length.toString())}",
+              //   minimumCharge:
+              //       "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs!.length == 0 ? "1" : (eventProvider.selecteTable.chairs!.length - 3).toString())}",
+              //   tableCount: "1",
+              //   totalDownPayment:
+              //       "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs!.length == 0 ? "1" : (eventProvider.selecteTable.chairs!.length - 3).toString())}",
+              //   onDelete: () {
+              //     print("Deleted");
+              //   },
+              // ),
               TableCard(
                 no:
                     eventProvider.getChair(
@@ -145,17 +163,16 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                     ) ??
                     [],
                 downPayment:
-                    "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs!.length.toString())}",
+                    "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs == null || eventProvider.selecteTable.chairs!.length == 0 ? "1" : eventProvider.selecteTable.chairs!.length.toString())}",
                 minimumCharge:
-                    "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
+                    "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs == null || eventProvider.selecteTable.chairs!.length == 0 ? "1" : eventProvider.selecteTable.chairs!.length.toString())}",
                 tableCount: "1",
                 totalDownPayment:
-                    "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
+                    "${eventProvider.selecteTable.price! * double.parse(eventProvider.selecteTable.chairs == null || eventProvider.selecteTable.chairs!.length == 0 ? "1" : eventProvider.selecteTable.chairs!.length.toString())}",
                 onDelete: () {
                   print("Deleted");
                 },
               ),
-
               const SizedBox(height: 16),
               const Text(
                 'Promo Code',
@@ -232,7 +249,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
+                            "${eventProvider.selecteTable.price!}",
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -257,7 +274,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            "${eventProvider.selecteTable.price! * double.parse((eventProvider.selecteTable.chairs!.length - 3).toString())}",
+                            "${eventProvider.selecteTable.price!}",
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -310,7 +327,7 @@ class TableBookingConfirmationScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     LoadingDialog.show(context);
-                  
+
                     final status = await eventProvider.buyTableTicketEvent(
                       eventProvider.tableBooking.toJson(),
                       eventProvider.selectEventModel.id.toString(),

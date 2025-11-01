@@ -75,7 +75,7 @@ class EventDetailScreen extends StatelessWidget {
 
                               itemBuilder: (context, index) {
                                 return Image.network(
-                                  "${AppUrls.imageUrlNgrok}${eventProvider.eventDetailsImageList[index]}",
+                                  "${AppUrls.imageUrl}${eventProvider.eventDetailsImageList[index]}",
                                   height: 180,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
@@ -119,28 +119,32 @@ class EventDetailScreen extends StatelessWidget {
                       ),
                     ),
                     // 🔹 Dots indicator
-                    Positioned(
-                      bottom: 8,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          eventProvider.eventDetailsModel.images!.length,
-                          (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 3),
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: eventProvider.currentIndex == index
-                                  ? Colors.white
-                                  : Colors.white30,
-                              shape: BoxShape.circle,
+                    eventProvider.eventDetailsModel.images!.isEmpty
+                        ? SizedBox()
+                        : Positioned(
+                            bottom: 8,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                eventProvider.eventDetailsModel.images!.length,
+                                (index) => Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3,
+                                  ),
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: eventProvider.currentIndex == index
+                                        ? Colors.white
+                                        : Colors.white30,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

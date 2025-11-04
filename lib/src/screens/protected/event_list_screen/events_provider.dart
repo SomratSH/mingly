@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/events/model/event_details_model.dart';
 import 'package:mingly/src/application/events/model/event_ticket_model.dart';
 import 'package:mingly/src/application/events/model/events_model.dart';
@@ -11,6 +12,9 @@ import 'package:mingly/src/application/events/model/table_order_model.dart';
 import 'package:mingly/src/application/events/model/table_ticket_model.dart';
 import 'package:mingly/src/application/events/model/ticket_order_model.dart';
 import 'package:mingly/src/application/events/repo/events_repo.dart';
+import 'package:mingly/src/constant/app_urls.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class EventsProvider extends ChangeNotifier {
   List<EventsModel> eventsList = [];
@@ -221,7 +225,6 @@ class EventsProvider extends ChangeNotifier {
   //event table ticket list
   TableTicketModel tableTicketModel = TableTicketModel();
   Future<bool> getTableTicketList(String date, String time) async {
-
     final response = await EventsRepo().getTableTicket(
       selectEventModel.id.toString(),
       date,
@@ -235,7 +238,7 @@ class EventsProvider extends ChangeNotifier {
     return false;
   }
 
-  List<String> getChair(int?id) {
+  List<String> getChair(int? id) {
     for (var e in tableTicketModel.tables!) {
       if (e.id == id) {
         if (e.chairs == null || e.chairs!.isEmpty) {
@@ -295,8 +298,6 @@ class EventsProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-
 
   Future<Map<String, dynamic>> buyTableTicketEvent(
     Map<String, dynamic> data,
@@ -380,5 +381,49 @@ class EventsProvider extends ChangeNotifier {
   void toggleDownPayment(bool value) {
     _isDownPayment = value;
     notifyListeners();
+  }
+
+  Future getRecomendedEvent() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final reseponse = await ApiService().getData(
+      AppUrls.getRecomendedEvent,
+      authToken: preferences.getString("authToken"),
+    );
+    return reseponse;
+  }
+
+  Future<Map<String, dynamic>> addToFavourite(String id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+          "${AppUrls.baseUrl}${AppUrls.addToFav}$id/",
+        ), // ✅ include id and trailing slash
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${preferences.getString("authToken")}",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        debugPrint("Added to favourites: $data");
+        return data;
+      } else if (response.statusCode == 400 || response.statusCode == 401) {
+        final data = jsonDecode(response.body);
+        return data;
+        debugPrint("Added to favourites: $data");
+      } else {
+        debugPrint(" Failed (${response.statusCode}): ${response.body}");
+        return {
+          "status": "error",
+          "message": "Request failed with ${response.statusCode}",
+        };
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+      return {"status": "error", "message": e.toString()};
+    }
   }
 }

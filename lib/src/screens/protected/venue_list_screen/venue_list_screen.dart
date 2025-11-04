@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mingly/src/components/couttry_city_widget.dart';
 import 'package:mingly/src/components/custom_loading_dialog.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:country_state_city_picker/country_state_city_picker.dart';
 
 class VenueListScreen extends StatefulWidget {
   const VenueListScreen({super.key});
@@ -17,6 +17,33 @@ class VenueListScreen extends StatefulWidget {
 class _VenueListScreenState extends State<VenueListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = "";
+  String countryValue = "";
+
+  String cityValue = "";
+  String? selectedVenueType;
+
+  final List<String> venueTypes = [
+    "Rooftop / Sky Lounge",
+    "Nightclub / Bar",
+    "Beach Club",
+    "Ballroom / Banquet Hall",
+    "Private Villa / Mansion",
+    "Yacht / Cruise",
+    "Restaurant",
+    "Lounge",
+    "Poolside Venue",
+    "Garden / Outdoor Terrace",
+    "Hotel Conference Room",
+    "Convention Center",
+    "Co-working Space",
+    "Exhibition Hall",
+    "Auditorium / Theatre",
+    "Private Members’ Club",
+    "Luxury Hotel Suite",
+    "Chateau / Estate",
+    "Art Gallery / Museum",
+    "Penthouse",
+  ];
 
   @override
   void initState() {
@@ -44,11 +71,23 @@ class _VenueListScreenState extends State<VenueListScreen> {
     final filteredVenues = venuesProvider.venuesList.where((venue) {
       final name = venue.name?.toLowerCase() ?? '';
       final address = venue.address?.toLowerCase() ?? '';
-      return name.contains(searchQuery) || address.contains(searchQuery);
+      final matchesSearch =
+          name.contains(searchQuery) || address.contains(searchQuery);
+
+      final matchesVenueType =
+          selectedVenueType == null ||
+          venue.address?.toLowerCase() == selectedVenueType!.toLowerCase();
+
+      final matchesCountry =
+          countryValue.isEmpty ||
+          (venue.country?.toLowerCase() == countryValue.toLowerCase());
+
+      final matchesCity =
+          cityValue.isEmpty ||
+          (venue.city?.toLowerCase() == cityValue.toLowerCase());
+
+      return matchesSearch && matchesVenueType && matchesCountry && matchesCity;
     }).toList();
-    String countryValue;
-    String stateValue;
-    String cityValue;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -68,133 +107,49 @@ class _VenueListScreenState extends State<VenueListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
+
             Container(
-              width: double.infinity,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 0.20,
-                    strokeAlign: BorderSide.strokeAlignCenter,
-                    color: const Color(0xFFF7D99A),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFF7D99A), width: 0.2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  dropdownColor: Colors.grey.shade900,
+                  value: selectedVenueType,
+                  hint: const Text(
+                    "Select Venue Type",
+                    style: TextStyle(color: Colors.white),
                   ),
+                  isExpanded: true,
+                  items: venueTypes.map((type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(
+                        type,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedVenueType = value;
+                    });
+                  },
                 ),
               ),
+            ),
+            SizedBox(height: 20),
+            CountryCityDropdown(
+              onChanged: (country, city) {
+                setState(() {
+                  countryValue = country ?? "";
+                  cityValue = city ?? "";
+                });
+              },
             ),
 
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: 'Thailand',
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Thailand',
-                          child: Row(
-                            children: [
-                              Icon(Icons.public, color: Color(0xFFD1B26F)),
-                              SizedBox(width: 8),
-                              Text(
-                                'Thailand',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Singapore',
-                          child: Row(
-                            children: [
-                              Icon(Icons.public, color: Color(0xFFD1B26F)),
-                              SizedBox(width: 8),
-                              Text(
-                                'Singapore',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {},
-                      dropdownColor: Colors.grey.shade900,
-                      iconEnabledColor: Colors.white,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: 'All cities',
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'All cities',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_city,
-                                color: Color(0xFFD1B26F),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'All cities',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Bangkok',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_city,
-                                color: Color(0xFFD1B26F),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Bangkok',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Singapore',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_city,
-                                color: Color(0xFFD1B26F),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Singapore',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {},
-                      dropdownColor: Colors.grey.shade900,
-                      iconEnabledColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: double.infinity,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 0.20,
-                    strokeAlign: BorderSide.strokeAlignCenter,
-                    color: const Color(0xFFF7D99A),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 16),
 
             // 🔍 Search Field
@@ -269,14 +224,14 @@ class _VenueListScreenState extends State<VenueListScreen> {
   }
 }
 
-// Reuse your _VenueCard widget (assuming it's already defined elsewhere)
-
+// ✅ Venue Card Widget
 class _VenueCard extends StatelessWidget {
   final String image;
   final String title;
   final String location;
   final String time;
   final Function()? onTap;
+
   const _VenueCard({
     required this.image,
     required this.title,
@@ -292,7 +247,7 @@ class _VenueCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Card(
-          color: Color(0xFF2E2D2C),
+          color: const Color(0xFF2E2D2C),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -327,9 +282,12 @@ class _VenueCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            location,
-                            style: const TextStyle(color: Colors.white70),
+                          Expanded(
+                            child: Text(
+                              location,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white70),
+                            ),
                           ),
                           Row(
                             children: [

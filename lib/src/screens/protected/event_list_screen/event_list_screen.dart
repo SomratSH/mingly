@@ -272,14 +272,14 @@ class _EventCard extends StatelessWidget {
                           : AppUrls.imageUrl + image,
                       height: 160,
                       width: double.infinity,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
 
                       errorBuilder: (context, error, stackTrace) {
                         debugPrint("❌ Image load failed: $error");
                         return Image.network(
                           'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
                           fit: BoxFit.cover,
-                          height: 160,
+                          height: 180,
                           width: double.infinity,
                         );
                       },

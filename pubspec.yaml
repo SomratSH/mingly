@@ -1,6 +1,6 @@
 name: mingly
 description: "Elite Networking &  Exclusive Events"
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -26,11 +26,12 @@ dependencies:
   flutter_html: ^3.0.0
   carousel_slider: ^5.1.1
   url_launcher: ^6.3.2
-  country_state_city_picker: ^1.2.8
   firebase_core: ^4.2.0
   firebase_auth: ^6.1.1
   google_sign_in: ^6.2.0
   cloud_firestore: ^6.0.3
+  flutter_linkify: ^6.0.0
+
 
 dev_dependencies:
   flutter_test:
@@ -56,3 +57,4 @@ flutter:
   assets:
     - lib/assets/images/
     - lib/assets/icons/
+    - lib/assets/country_city.json

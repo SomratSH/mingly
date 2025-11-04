@@ -34,18 +34,18 @@ class VenueDetailScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        actions: [
-          InkWell(
-            onTap: () {},
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.star_border, color: Colors.black),
-            ),
-          ),
-        ],
+        // actions: [
+        //   InkWell(
+        //     onTap: () {},
+        //     child: DecoratedBox(
+        //       decoration: BoxDecoration(
+        //         color: Colors.white,
+        //         shape: BoxShape.circle,
+        //       ),
+        //       child: const Icon(Icons.star_border, color: Colors.black),
+        //     ),
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -171,6 +171,29 @@ class VenueDetailScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: const [
+                            Icon(Icons.group, color: Color(0xFFD1B26F)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Capacity',
+                              style: TextStyle(
+                                color: Color(0xFFD1B26F),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Text(
+                              provider.selectedVenueData.capacity.toString(),
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -233,7 +256,7 @@ class VenueDetailScreen extends StatelessWidget {
                                                         .thumbnailImage ==
                                                     null
                                             ? "https://www.directmobilityonline.co.uk/assets/img/noimage.png"
-                                            : "${AppUrls.imageUrlNgrok}${eventProvider.eventsListVenueWise[index].images!.first.thumbnailImage}",
+                                            : "${AppUrls.imageUrl}${eventProvider.eventsListVenueWise[index].images!.first.thumbnailImage}",
                                         name: eventProvider
                                             .eventsListVenueWise[index]
                                             .eventName
@@ -389,11 +412,37 @@ class _PopularEventCard extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                Image.network(
-                  image!,
-                  height: 160,
+                Container(
+                  height: 200,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade900, // fallback background color
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade800, width: 1),
+                  ),
+                  clipBehavior:
+                      Clip.antiAlias, // ensures image respects borderRadius
+                  child: image != null && image.isNotEmpty
+                      ? Image.network(
+                          image,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.grey.shade600,
+                              size: 40,
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey.shade600,
+                            size: 40,
+                          ),
+                        ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

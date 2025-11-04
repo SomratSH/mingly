@@ -3,7 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mingly/src/application/venues/model/venue_menu_model.dart'; // add `intl: ^0.18.0` (or latest) to pubspec.yaml
+import 'package:mingly/src/application/venues/model/venue_menu_model.dart';
+import 'package:mingly/src/constant/app_urls.dart'; // add `intl: ^0.18.0` (or latest) to pubspec.yaml
 
 /// Reusable MenuCard widget
 class MenuCardVenue extends StatelessWidget {
@@ -37,7 +38,7 @@ class MenuCardVenue extends StatelessWidget {
                   bottomLeft: Radius.circular(12),
                 ),
                 child: Image.network(
-                  item.image!,
+                  AppUrls.imageUrl + item.image!,
                   width: 110,
                   height: 110,
                   fit: BoxFit.cover,
@@ -143,8 +144,3 @@ class MenuCardVenue extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

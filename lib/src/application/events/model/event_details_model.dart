@@ -1,4 +1,5 @@
 class EventDetailsModel {
+  int? id;
   String? eventName;
   String? description;
   String? city;
@@ -20,6 +21,7 @@ class EventDetailsModel {
   });
 
   EventDetailsModel.fromJson(Map<String, dynamic> json) {
+    id = json["event_id"];
     eventName = json['event_name'];
     description = json['description'];
     city = json['city'];

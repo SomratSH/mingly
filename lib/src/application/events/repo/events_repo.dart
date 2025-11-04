@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:mingly/src/api_service/api_service.dart';
 import 'package:mingly/src/application/events/model/event_details_model.dart';
@@ -110,11 +110,13 @@ class EventsRepo {
   }
 
   Future getRecomendedEvent() async {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
+    SharedPreferences preferences = await SharedPreferences.getInstance();
     final reseponse = await ApiService().getData(
       AppUrls.getRecomendedEvent,
       authToken: preferences.getString("authToken"),
     );
     return reseponse;
   }
+
+  
 }

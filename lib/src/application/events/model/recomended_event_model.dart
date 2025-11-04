@@ -29,7 +29,7 @@ class Recommendations {
   String? about;
   String? description;
   String? currency;
-  Null? picture;
+  String? picture;
   int? totalBookings;
   List<Images>? images;
   String? venueName;

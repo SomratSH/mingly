@@ -22,7 +22,7 @@ class LoadingDialog {
               children: [
                 // App Icon
                 Image.asset(
-                  "lib/assets/images/logo.png",
+                  "lib/assets/images/mingly_logo.png",
                   width: 40,
                   height: 40,
                   fit: BoxFit.fill,
@@ -50,7 +50,7 @@ class LoadingDialog {
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
-                    color: Colors.blue,
+                    color: Theme.of(context).colorScheme.primary,
                     strokeWidth: 2,
                   ),
                 ),

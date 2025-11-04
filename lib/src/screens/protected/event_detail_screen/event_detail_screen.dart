@@ -8,6 +8,8 @@ import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
 import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailScreen extends StatelessWidget {
   EventsModel model;
@@ -31,6 +33,32 @@ class EventDetailScreen extends StatelessWidget {
           eventProvider.eventDetailsModel.eventName.toString(),
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite_border, color: const Color(0xFFD1B26F)),
+            onPressed: () async {
+              // Toggle favorite
+              LoadingDialog.show(context);
+              final response = await eventProvider.addToFavourite(
+                eventProvider.eventDetailsModel.id.toString(),
+              );
+              if (response["message"] != null) {
+                CustomSnackbar.show(
+                  context,
+                  message: response["message"],
+                  backgroundColor: Colors.green,
+                );
+              } else {
+                CustomSnackbar.show(
+                  context,
+                  message: "Something wrong, try again",
+                  backgroundColor: Colors.green,
+                );
+              }
+              LoadingDialog.hide(context);
+            },
+          ),
+        ],
         centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
@@ -203,17 +231,28 @@ class EventDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                model.description.toString(),
-                style: TextStyle(color: Colors.white70),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Read More...',
-                  style: TextStyle(color: Color(0xFFD1B26F), fontSize: 12),
+
+              Linkify(
+                text: model.description ?? '',
+                onOpen: (link) async {
+                  print('Opening link: ${link.url}');
+                  final Uri url = Uri.parse(link.url);
+
+                  // Always use external mode
+                  if (!await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  )) {
+                    throw Exception('Could not launch $url');
+                  }
+                },
+                style: const TextStyle(color: Colors.white),
+                linkStyle: const TextStyle(
+                  color: Colors.blueAccent,
+                  decoration: TextDecoration.underline,
                 ),
-              ),
+              ), // Text(
+
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

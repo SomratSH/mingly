@@ -178,7 +178,7 @@ class HomeScreen extends StatelessWidget {
                                     homeProvider.addImageList[index].imageUrl
                                         .toString(),
                               ),
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fill,
                             ),
                           ),
                         );
@@ -317,7 +317,7 @@ class HomeScreen extends StatelessWidget {
                                       .venuesFeaturedList[index]
                                       .name!,
                                   location:
-                                      'Marina Bay Sands Tower 3\nLevel 57\nSingapore',
+                                      '${venueProvider.venuesFeaturedList[index].address}\n${venueProvider.venuesFeaturedList[index].city}, ${venueProvider.venuesFeaturedList[index].country}',
                                 ),
                               ),
                             ),
@@ -371,13 +371,31 @@ class HomeScreen extends StatelessWidget {
                               (index) => InkWell(
                                 onTap: () => context.push('/venue-detail'),
                                 child: _RecommendationCard(
-                                  image: eventsProvider
-                                      .recomendedEventModel
-                                      .recommended![index]
-                                      .images!
-                                      .first
-                                      .thumbnailImage
-                                      .toString(),
+                                  image:
+                                      (eventsProvider
+                                                  .recomendedEventModel
+                                                  .recommended?[index]
+                                                  .images !=
+                                              null &&
+                                          eventsProvider
+                                              .recomendedEventModel
+                                              .recommended![index]
+                                              .images!
+                                              .isNotEmpty &&
+                                          eventsProvider
+                                                  .recomendedEventModel
+                                                  .recommended![index]
+                                                  .images!
+                                                  .first
+                                                  .thumbnailImage !=
+                                              null)
+                                      ? eventsProvider
+                                            .recomendedEventModel
+                                            .recommended![index]
+                                            .images!
+                                            .first
+                                            .thumbnailImage!
+                                      : 'https://via.placeholder.com/150', // fallback image
                                   title: 'Sky High Soirée- MU;IN',
                                   location: 'New York',
                                   tag: 'Gold member',
@@ -556,6 +574,7 @@ class _EventCard extends StatelessWidget {
                     onTap: () async {
                       LoadingDialog.show(context);
                       // eventProvider.selectEventModelFunction(event);
+                      
                       await eventProvider.getEventsDetailsData(
                         eventProvider
                             .popularEventModel
@@ -584,7 +603,7 @@ class _EventCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(
-                              height: 140,
+                              height: 160,
                               child:
                                   eventProvider
                                       .popularEventModel
@@ -604,7 +623,7 @@ class _EventCard extends StatelessWidget {
                                               .first
                                               .thumbnailImage
                                               .toString(),
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                     ),
                             ),
                             Padding(
@@ -1077,7 +1096,7 @@ class _RecommendationCard extends StatelessWidget {
                                               .first
                                               .thumbnailImage
                                               .toString(),
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                     ),
                             ),
                             Padding(

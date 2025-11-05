@@ -78,14 +78,6 @@ class TicketSelectionModal extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Max (${provider.maxTickets} Tickets)',
-                          style: const TextStyle(
-                            color: Color(0xFF888888),
-                            fontSize: 14,
-                          ),
-                        ),
                       ],
                     ),
                     Row(
@@ -161,13 +153,7 @@ class TicketSelectionModal extends StatelessWidget {
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
-                          Icons.add,
-                          color: provider.ticketCount < provider.maxTickets
-                              ? Colors.white
-                              : const Color(0xFF666666),
-                          size: 20,
-                        ),
+                        child: Icon(Icons.add, color: Colors.white, size: 20),
                       ),
                     ),
                   ],

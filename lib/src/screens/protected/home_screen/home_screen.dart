@@ -574,7 +574,7 @@ class _EventCard extends StatelessWidget {
                     onTap: () async {
                       LoadingDialog.show(context);
                       // eventProvider.selectEventModelFunction(event);
-                      
+
                       await eventProvider.getEventsDetailsData(
                         eventProvider
                             .popularEventModel
@@ -1097,6 +1097,34 @@ class _RecommendationCard extends StatelessWidget {
                                               .thumbnailImage
                                               .toString(),
                                       fit: BoxFit.contain,
+
+                                      errorBuilder: (context, error, stackTrace) {
+                                        if (error
+                                                is NetworkImageLoadException &&
+                                            error.statusCode == 404) {
+                                          print(
+                                            "image error " +
+                                                error.statusCode.toString(),
+                                          );
+                                          return Container(
+                                            width: 120,
+                                            height: 120,
+                                            color: Colors.grey[500],
+                                            child: const Icon(
+                                              Icons.image_not_supported,
+                                            ),
+                                          );
+                                        } else {
+                                          return Container(
+                                            width: 120,
+                                            height: 120,
+                                            color: Colors.grey[500],
+                                            child: const Icon(
+                                              Icons.image_not_supported,
+                                            ),
+                                          );
+                                        }
+                                      },
                                     ),
                             ),
                             Padding(

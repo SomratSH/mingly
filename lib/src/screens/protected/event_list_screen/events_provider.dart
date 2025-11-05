@@ -133,7 +133,7 @@ class EventsProvider extends ChangeNotifier {
   }
 
   int ticketCount = 1;
-  final int maxTickets = 5;
+  final int maxTickets = 1000;
 
   double totalPrice = 0.0;
   double ticketTotalPrice = 0.0;
@@ -232,6 +232,11 @@ class EventsProvider extends ChangeNotifier {
     );
     if (response.isNotEmpty && response['tables'] != null) {
       tableTicketModel = TableTicketModel.fromJson(response);
+      listedTimeSlot.clear();
+      listedTimeSlot = generateTimeSlots(
+        tableTicketModel.sessionInfo!.sessionStart!,
+        tableTicketModel.sessionInfo!.sessionEnd!,
+      );
       notifyListeners();
       return true;
     }
@@ -326,24 +331,45 @@ class EventsProvider extends ChangeNotifier {
     }
   }
 
-  List<String> listedTimeSlot = [
-    '10:00',
-    '10:15',
-    '10:30',
-    '10:45',
-    '11:00',
-    '11:15',
-    '11:30',
-    '11:45',
-    '12:00',
-    '12:15',
-    '12:30',
-    '12:45',
-    '13:00',
-  ];
+  List<String> generateTimeSlots(
+    String start,
+    String end, {
+    int intervalMinutes = 60,
+  }) {
+    final now = DateTime.now();
+    DateTime startTime = DateTime.parse(
+      "${now.toString().split(' ')[0]} $start",
+    );
+    DateTime endTime = DateTime.parse("${now.toString().split(' ')[0]} $end");
+
+    // Handle overnight range (crosses midnight)
+    if (endTime.isBefore(startTime)) {
+      endTime = endTime.add(const Duration(days: 1));
+    }
+
+    final slots = <String>[];
+    DateTime current = startTime;
+
+    while (current.isBefore(endTime) || current.isAtSameMomentAs(endTime)) {
+      slots.add(_formatTime24(current));
+      current = current.add(Duration(minutes: intervalMinutes));
+    }
+
+    return slots;
+  }
+
+  String _formatTime24(DateTime time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
   int indexOfSelectedTimeSlot = -1;
+  String selectedTableTime = "";
   void selectTimeSlot(int index) {
     indexOfSelectedTimeSlot = index;
+    selectedTableTime = "";
+    selectedTableTime = listedTimeSlot[index];
     notifyListeners();
   }
 
@@ -375,6 +401,8 @@ class EventsProvider extends ChangeNotifier {
   }
 
   bool _isDownPayment = false;
+
+  List<String> listedTimeSlot = [];
 
   bool get isDownPayment => _isDownPayment;
 

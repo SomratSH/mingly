@@ -153,6 +153,25 @@ class _ReservationCard extends StatelessWidget {
                       width: 90,
                       height: 90,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        if (error is NetworkImageLoadException &&
+                            error.statusCode == 404) {
+                          print("image error " + error.statusCode.toString());
+                          return Container(
+                            width: 120,
+                            height: 120,
+                            color: Colors.grey[500],
+                            child: const Icon(Icons.image_not_supported),
+                          );
+                        } else {
+                          return Container(
+                            width: 120,
+                            height: 120,
+                            color: Colors.grey[500],
+                            child: const Icon(Icons.image_not_supported),
+                          );
+                        }
+                      },
                     ),
             ),
             Expanded(

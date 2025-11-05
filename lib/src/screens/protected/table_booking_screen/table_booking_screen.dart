@@ -382,7 +382,11 @@ class _TableSlotButton extends StatelessWidget {
           print("Data show" + parts.length.toString());
           String formate = "${parts[0]}:${parts[1]}";
 
-          eventProvider.selecteTableBooking(table.tableId!, formate, table.id!);
+          eventProvider.selecteTableBooking(
+            table.tableId!,
+            eventProvider.selectedTableTime,
+            table.id!,
+          );
           eventProvider.selectedTable(table);
         }
       },

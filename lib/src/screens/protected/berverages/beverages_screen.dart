@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/components/helpers.dart';
+import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/berverages/widget/beverage_item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -136,7 +137,7 @@ class BeveragesScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Image.network(
-                                item.image!,
+                                AppUrls.imageUrl + item.image!,
                                 width: 120,
                                 height: 120,
                                 fit: BoxFit.cover,

@@ -289,7 +289,7 @@ class VenueDetailScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Image.network(
-                                      item.image!,
+                                      AppUrls.imageUrl + item.image!,
                                       width: 120,
                                       height: 120,
                                       fit: BoxFit.cover,

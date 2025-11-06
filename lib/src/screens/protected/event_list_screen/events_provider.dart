@@ -225,11 +225,16 @@ class EventsProvider extends ChangeNotifier {
   //event table ticket list
   TableTicketModel tableTicketModel = TableTicketModel();
   Future<bool> getTableTicketList(String date, String time) async {
+    print(time);
+    print(date);
     final response = await EventsRepo().getTableTicket(
       selectEventModel.id.toString(),
       date,
       time,
     );
+    tableTicketModel = TableTicketModel();
+    listedTimeSlot.clear();
+    notifyListeners();
     if (response.isNotEmpty && response['tables'] != null) {
       tableTicketModel = TableTicketModel.fromJson(response);
       listedTimeSlot.clear();
@@ -453,5 +458,50 @@ class EventsProvider extends ChangeNotifier {
       debugPrint("Error: $e");
       return {"status": "error", "message": e.toString()};
     }
+  }
+
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+
+  DateTime? get selectedDate => _selectedDate;
+  TimeOfDay? get selectedTime => _selectedTime;
+
+  void setDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
+
+  void setTime(TimeOfDay time) {
+    _selectedTime = time;
+    notifyListeners();
+  }
+
+  String get formattedDate {
+    if (_selectedDate == null) return "Select Date";
+    return "${_selectedDate!.year}-"
+        "${_selectedDate!.month.toString().padLeft(2, '0')}-"
+        "${_selectedDate!.day.toString().padLeft(2, '0')}";
+  }
+
+  String get formattedTime {
+    if (_selectedTime == null) return "Select Time";
+    final hour = _selectedTime!.hourOfPeriod.toString().padLeft(2, '0');
+    final minute = _selectedTime!.minute.toString().padLeft(2, '0');
+    final period = _selectedTime!.period == DayPeriod.am ? 'AM' : 'PM';
+    return "$hour:$minute $period";
+  }
+
+  // String get formattedTimeWithoutPeriod {
+  //   if (_selectedTime == null) return "Select Time";
+  //   final hour = _selectedTime!.hourOfPeriod.toString().padLeft(2, '0');
+  //   final minute = _selectedTime!.minute.toString().padLeft(2, '0');
+
+  //   return "$hour:$minute ";
+  // }
+  String get formattedTimeWithoutPeriod {
+    if (_selectedTime == null) return "Select Time";
+    final hour = _selectedTime!.hour.toString().padLeft(2, '0');
+    final minute = _selectedTime!.minute.toString().padLeft(2, '0');
+    return "$hour:$minute";
   }
 }

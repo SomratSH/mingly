@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mingly/src/application/events/model/table_ticket_model.dart';
+import 'package:mingly/src/components/custom_loading_dialog.dart'
+    show LoadingDialog;
 import 'package:mingly/src/components/custom_snackbar.dart';
 import 'package:mingly/src/constant/app_urls.dart';
 import 'package:mingly/src/screens/protected/event_list_screen/events_provider.dart';
+import 'package:mingly/src/screens/protected/venue_list_screen/venue_provider.dart';
 import 'package:provider/provider.dart';
 
 class TableBookingScreen extends StatelessWidget {
@@ -14,6 +17,7 @@ class TableBookingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final eventProvider = context.watch<EventsProvider>();
+    final venueProvider = context.watch<VenueProvider>();
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -61,8 +65,8 @@ class TableBookingScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const Text(
-                'North Miami Beach, FL 33160 |',
+              Text(
+                '${eventProvider.eventDetailsModel.city}',
                 style: TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),
@@ -74,93 +78,131 @@ class TableBookingScreen extends StatelessWidget {
                     "  ${eventProvider.eventDetailsModel.sessionStartTime.toString()} - ${eventProvider.eventDetailsModel.sessionEndTime.toString()}",
                     style: TextStyle(color: Colors.white),
                   ),
+
+                  Text(
+                    "  ${eventProvider.eventDetailsModel.firstSessionDate.toString()}",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SvgPicture.asset("lib/assets/icons/calender_gold.svg"),
-                  SizedBox(width: 5),
-                  Text("17/12/2022"),
-                  Icon(Icons.arrow_drop_down_sharp),
+                  InkWell(
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            eventProvider.selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) eventProvider.setDate(pickedDate);
 
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10.47,
-                          vertical: 8.37,
-                        ),
-                        decoration: ShapeDecoration(
-                          color: Colors.white.withValues(alpha: 0.13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.23),
+                      if (eventProvider.selectedDate != null &&
+                          eventProvider.selectedTime != null) {
+                        LoadingDialog.show(context);
+                        final status = await eventProvider.getTableTicketList(
+                          eventProvider.formattedDate,
+                          eventProvider.formattedTimeWithoutPeriod,
+                        );
+                        await venueProvider.getVenueMenuList(
+                          int.parse(
+                            venueProvider.getVenueId(
+                              eventProvider.selectEventModel.venueName
+                                  .toString(),
+                            ),
                           ),
+                        );
+                        LoadingDialog.hide(context);
+                        print(status);
+                      } else {
+                        CustomSnackbar.show(
+                          context,
+                          message: "Time Not selected",
+                          backgroundColor: Colors.red,
+                        );
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        SvgPicture.asset("lib/assets/icons/calender_gold.svg"),
+                        const SizedBox(width: 5),
+                        Text(
+                          eventProvider.formattedDate,
+                          style: const TextStyle(color: Colors.white),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          spacing: 10.47,
-                          children: [
-                            Icon(Icons.access_time, color: Color(0xFFD1B26F)),
-                            Text(
-                              '12:15',
-                              style: TextStyle(
-                                color: const Color(0xFFCECECE),
-                                fontSize: 12.56,
-                                fontFamily: 'Segoe UI',
-                                fontWeight: FontWeight.w600,
-                                height: 1.67,
-                              ),
+                        const Icon(
+                          Icons.arrow_drop_down_sharp,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  InkWell(
+                    onTap: () async {
+                      final pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime:
+                            eventProvider.selectedTime ?? TimeOfDay.now(),
+                      );
+                      if (pickedTime != null) eventProvider.setTime(pickedTime);
+                      if (eventProvider.selectedDate != null &&
+                          eventProvider.selectedTime != null) {
+                        LoadingDialog.show(context);
+                        final status = await eventProvider.getTableTicketList(
+                          eventProvider.formattedDate,
+                          eventProvider.formattedTimeWithoutPeriod,
+                        );
+                        await venueProvider.getVenueMenuList(
+                          int.parse(
+                            venueProvider.getVenueId(
+                              eventProvider.selectEventModel.venueName
+                                  .toString(),
                             ),
-                            Container(
-                              width: 10.47,
-                              height: 10.47,
-                              child: Stack(),
-                            ),
-                          ],
+                          ),
+                        );
+                        LoadingDialog.hide(context);
+                      } else {
+                        CustomSnackbar.show(
+                          context,
+                          message: "Date Not selected",
+                          backgroundColor: Colors.red,
+                        );
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.47,
+                        vertical: 8.37,
+                      ),
+                      decoration: ShapeDecoration(
+                        color: Colors.white.withOpacity(0.13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.23),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10.47,
-                          vertical: 8.37,
-                        ),
-                        decoration: ShapeDecoration(
-                          color: Colors.white.withValues(alpha: 0.13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.23),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            color: Color(0xFFD1B26F),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          spacing: 10.47,
-                          children: [
-                            Icon(Icons.group, color: Color(0xFFD1B26F)),
-                            Text(
-                              '2',
-                              style: TextStyle(
-                                color: const Color(0xFFCECECE),
-                                fontSize: 12.56,
-                                fontFamily: 'Segoe UI',
-                                fontWeight: FontWeight.w600,
-                                height: 1.67,
-                              ),
+                          const SizedBox(width: 8),
+                          Text(
+                            eventProvider.formattedTime,
+                            style: const TextStyle(
+                              color: Color(0xFFCECECE),
+                              fontSize: 12.56,
+                              fontFamily: 'Segoe UI',
+                              fontWeight: FontWeight.w600,
                             ),
-                            Container(
-                              width: 10.47,
-                              height: 10.47,
-                              child: Stack(),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -177,13 +219,7 @@ class TableBookingScreen extends StatelessWidget {
                 eventProvider.eventDetailsModel.description.toString(),
                 style: TextStyle(color: Colors.white70),
               ),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Read More...',
-                  style: TextStyle(color: Color(0xFFD1B26F), fontSize: 12),
-                ),
-              ),
+
               const SizedBox(height: 24),
               const Text(
                 'Select a time you like',
@@ -193,49 +229,59 @@ class TableBookingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 15,
-                runSpacing: 8,
-                children: [
-                  ...List.generate(eventProvider.listedTimeSlot!.length, (
-                    index,
-                  ) {
-                    final timeSlot = eventProvider.listedTimeSlot![index];
+              eventProvider.listedTimeSlot.isEmpty
+                  ? SizedBox()
+                  : Wrap(
+                      spacing: 15,
+                      runSpacing: 8,
+                      children: [
+                        ...List.generate(eventProvider.listedTimeSlot!.length, (
+                          index,
+                        ) {
+                          final timeSlot = eventProvider.listedTimeSlot![index];
 
-                    return _TimeSlotButton(label: timeSlot, index: index);
-                  }),
-                ],
-              ),
+                          return _TimeSlotButton(label: timeSlot, index: index);
+                        }),
+                      ],
+                    ),
               const SizedBox(height: 24),
-              Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white24),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child:
-                      eventProvider.tableTicketModel.tables!.first.image == null
-                      ? Image.network(
-                          'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
-                          height: 200,
-                          fit: BoxFit.contain,
-                        )
-                      : Image.network(
-                          '${AppUrls.imageUrl}${eventProvider.tableTicketModel.tables!.first.image}',
-                          height: 200,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            debugPrint("❌ Image load failed: $error");
-                            return Image.network(
-                              'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
-                              fit: BoxFit.cover,
-                              height: 160,
-                              width: double.infinity,
-                            );
-                          },
+
+              eventProvider.tableTicketModel.tables == null
+                  ? Center(child: Text("No Tables found in this session"))
+                  : Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white24),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                ),
-              ),
+                        child:
+                            eventProvider
+                                    .tableTicketModel
+                                    .tables!
+                                    .first
+                                    .image ==
+                                null
+                            ? Image.network(
+                                'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                                height: 200,
+                                fit: BoxFit.contain,
+                              )
+                            : Image.network(
+                                '${AppUrls.imageUrl}${eventProvider.tableTicketModel.tables!.first.image}',
+                                height: 200,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  debugPrint("❌ Image load failed: $error");
+                                  return Image.network(
+                                    'https://www.directmobilityonline.co.uk/assets/img/noimage.png',
+                                    fit: BoxFit.cover,
+                                    height: 160,
+                                    width: double.infinity,
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
               const SizedBox(height: 16),
               const Text(
                 'Book Preferred Slot',
@@ -245,28 +291,34 @@ class TableBookingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ...List.generate(eventProvider.tableTicketModel.tables!.length, (
-                    index,
-                  ) {
-                    final table = eventProvider.tableTicketModel.tables![index];
+              eventProvider.tableTicketModel.tables == null ||
+                      eventProvider.tableTicketModel.tables!.isEmpty
+                  ? SizedBox()
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ...List.generate(
+                          eventProvider.tableTicketModel.tables!.length,
+                          (index) {
+                            final table =
+                                eventProvider.tableTicketModel.tables![index];
 
-                    // Example: consider "available" if availabilityStatus == "available"
-                    final isAvailable = table.availabilityStatus == "available";
+                            // Example: consider "available" if availabilityStatus == "available"
+                            final isAvailable =
+                                table.availabilityStatus == "available";
 
-                    return _TableSlotButton(
-                      id: table.tableId!.toInt(),
-                      label:
-                          'Table\n${(table.tcketNumber ?? index + 1).toString().padLeft(2, '0')}',
-                      available: isAvailable,
-                      table: table,
-                    );
-                  }),
-                ],
-              ),
+                            return _TableSlotButton(
+                              id: table.tableId!.toInt(),
+                              label:
+                                  'Table\n${(table.tcketNumber ?? index + 1).toString().padLeft(2, '0')}',
+                              available: isAvailable,
+                              table: table,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
